@@ -2,6 +2,7 @@
 #define DISPLAY_H
 
 #include <SDL2/SDL.h>
+#include "vectors.h"
 
 // Global variables
 // Extern: initialized outside of header file

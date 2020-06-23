@@ -1,8 +1,15 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-extern struct vec2_t;
+typedef struct {
+    float x;
+    float y;
+} vec2_t;
 
-extern struct vec3_t;
+typedef struct {
+    float x;
+    float y;
+    float z;
+} vec3_t;
 
 #endif

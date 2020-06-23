@@ -1,8 +1,5 @@
-#include "header/vector.h"
-#include "header/display.h"
-
-const int N_POINTS = 729;
-vec3_t cube_points[N_POINTS];    // 9x9x9 cube
+#include "vectors.h"
+#include "display.h"
 
 bool is_running = false;
 
@@ -19,19 +16,6 @@ void setup() {
         win_width,  // Width to apply over
         win_height  // Height to apply over
     );
-
-    // Start loading my array of vectors
-    int i = 0;
-
-    for(float x = -1; x <= 1; x += 0.25) {
-        for(float y = -1; y <= 1; y += 0.25) {
-            for(float z = -1; x <= 1; x += 0.25) {
-                vec3_t point = { x, y, z };
-                cube_points[i] = point;
-                i++;
-            }
-        }
-    }
 }
 
 void process_input() {
@@ -93,7 +77,7 @@ int main() {
     is_running = init_window();
 
     setup();
-
+    vec3_t vec = { 2.0, 3.0, 1.0 };
     while(is_running) {
         process_input();
         update();
