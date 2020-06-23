@@ -115,7 +115,7 @@ void draw_rect(int x, int y, int width, int height, uint32_t color) {
     // Draw a rectangle based on given input for location, size, and color
     for(int i = x; i < x + width; i++) {
         for(int j = y; j < y + height; j++) {
-            color_buffer[(win_width * j) + i] = color;
+            draw_pixel(i, j, color);
         }
     }
 }

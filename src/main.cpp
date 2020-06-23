@@ -3,6 +3,13 @@
 
 bool is_running = false;
 
+const int N_POINTS = 729;
+vec3_t cube_points[N_POINTS];   // 9 x 9 x 9 cube
+vec2_t projected_points[N_POINTS];  // 3D points projected on 2D screen
+
+// Field of view factor to scale up points
+float fov_factor = 256;
+
 void setup() {
 
     // Allocate 32 bits of memory for color for each pixel on the screen
@@ -16,6 +23,20 @@ void setup() {
         win_width,  // Width to apply over
         win_height  // Height to apply over
     );
+
+    // Start loading array of vectors
+    int i = 0;
+
+    for(float x = -1; x <= 1; x += 0.25) {
+        for(float y = -1; y <= 1; y += 0.25) {
+            for(float z = -1; z <= 1; z += 0.25) {
+                vec3_t point = { .x = x, .y = y, .z = z };
+                // printf("%f %f %f\n", point.x, point.y, point.z);
+                cube_points[i] = point;
+                i++;
+            }
+        }
+    }
 }
 
 void process_input() {
@@ -42,27 +63,54 @@ void process_input() {
     }
 }
 
-void update() {
+vec2_t project_ortho(vec3_t point) {
+    // Convert 3D point to 2D on x and y axis
+    vec2_t projected_point = {
+        .x = (fov_factor * point.x),    // Multiply by field ov view factor to scale the point up
+        .y = (fov_factor * point.y)
+    };
 
+    return projected_point;
+}
+
+vec2_t project_persp(vec3_t point) {
+    // Convert 3D point to 2D on x and y axis
+    vec2_t projected_point = {
+        .x = (fov_factor * point.x / point.z),  // Similar triangles formula to scale down point in perspective
+        .y = (fov_factor * point.y / point.z)
+    };
+
+    return projected_point;
+}
+
+void update() {
+    for(int i = 0; i < N_POINTS; i++) {
+
+        // Receive a 3D point
+        vec3_t point = cube_points[i];
+
+        // Project the 3D point as a 2D point on a 2D screen
+        vec2_t projected_point = project_persp(point);
+
+        // Save the 2D point to the projected points array
+        projected_points[i] = projected_point;
+    }
 }
 
 void render() {
 
-    SDL_SetRenderDrawColor( // Select the draw color
-        renderer,   // Pointer to renderer
-        255,    // Red value
-        255,    // Green value
-        255,    // Blue value
-        255     // Alpha value
-    );
-
-    SDL_RenderClear(renderer);  // Clear the renderer
-
     draw_grid(60, 0xFF606060);  // Draw a gray grid
 
-    // draw_pixel(245, 425, 0xFFFFFFFF);   // Draw a white pixel
-
-    // draw_rect(240, 180, 800, 600, 0xFFFF0000);  // Draw a red rectangle
+    // Loop through all projected points and render them
+    for(int i = 0; i < N_POINTS; i++) {
+        vec2_t projected_point = projected_points[i];
+        draw_rect(
+            projected_point.x + win_width / 2, // Push rectangle to middle of screen
+            projected_point.y + win_height / 2,
+            4,
+            4,
+            0xFFFFFF00);
+    }
 
     render_color_buffer();  // Render the color buffer texture
 
@@ -77,7 +125,7 @@ int main() {
     is_running = init_window();
 
     setup();
-    vec3_t vec = { 2.0, 3.0, 1.0 };
+
     while(is_running) {
         process_input();
         update();
