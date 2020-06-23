@@ -1,4 +1,4 @@
-#include "display.h"
+#include "header/display.h"
 
 // Global variables
 int win_width = 960;

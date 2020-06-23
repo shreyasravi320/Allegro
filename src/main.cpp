@@ -1,5 +1,5 @@
-#include "display.h"
-#include "vector.h"
+#include "header/vector.h"
+#include "header/display.h"
 
 const int N_POINTS = 729;
 vec3_t cube_points[N_POINTS];    // 9x9x9 cube
