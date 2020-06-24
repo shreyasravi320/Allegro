@@ -5,6 +5,13 @@
 
 // Global variables
 // Extern: initialized outside of header file
+
+// Frame Rate
+#define FRAME_RATE (60)
+
+// Frame Target Time Length
+#define FRAME_TARGET_LENGTH (1000 / FRAME_RATE) // Milliseconds / Frame Rate
+
 extern int win_width;
 extern int win_height;
 extern SDL_Window* window;
@@ -26,6 +33,10 @@ void render_color_buffer();
 void draw_grid(int spacing, uint32_t color);
 
 void draw_pixel(int x, int y, uint32_t color);
+
+void draw_line(int x0, int y0, int x1, int y1, uint32_t color);
+
+void draw_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color);
 
 void draw_rect(int x, int y, int width, int height, uint32_t color);
 
