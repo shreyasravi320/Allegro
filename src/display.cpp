@@ -1,5 +1,7 @@
 #include "display.h"
 
+using namespace std;
+
 // Global variables
 int win_width = 960;
 int win_height = 540;
@@ -152,8 +154,6 @@ void draw_rect(int x, int y, int width, int height, uint32_t color) {
 void quit() {
 
     // Actions to perform when program quits
-    free(color_buffer); // Free memory stored in color buffer
-
     SDL_DestroyRenderer(renderer);  // Destroy renderer
 
     SDL_DestroyWindow(window);  // Destroy window

@@ -1,6 +1,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#include <iostream>
 #include <SDL2/SDL.h>
 
 // Global variables

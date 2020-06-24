@@ -1,7 +1,10 @@
 #ifndef VECTORS_H
 #define VECTORS_H
 
+#include <iostream>
 #include <math.h>
+
+using namespace std;
 
 typedef struct {
     float x;
