@@ -11,7 +11,7 @@ vector<triangle_t> triangles_to_render;  // Need dynamically allocated memory si
 bool is_running = false;
 
 // Field of view factor to scale up points
-float fov_factor = 128;
+float fov_factor = 1024;
 
 // Camera origin
 vec3_t camera_position = { .x = 0, .y = 0, .z = -5 };
@@ -40,7 +40,7 @@ void setup() {
     // Loads the cube values in the mesh data structure
     // load_cube_mesh_data();
 
-    // Loads obj data values from mesh structure
+    // Load the obj mesh data
     load_obj_mesh_data("./models/cube.obj");
 }
 
@@ -64,6 +64,24 @@ void process_input() {
                 is_running = false;
             }
 
+            if(event.key.keysym.sym == SDLK_1) {
+                mesh.vertices.clear();
+                mesh.faces.clear();
+                load_obj_mesh_data("./models/sphere.obj");
+            }
+
+            if(event.key.keysym.sym == SDLK_2) {
+                mesh.vertices.clear();
+                mesh.faces.clear();
+                load_obj_mesh_data("./models/torus.obj");
+            }
+
+            if(event.key.keysym.sym == SDLK_3) {
+                mesh.vertices.clear();
+                mesh.faces.clear();
+                load_obj_mesh_data("./models/suzanne.obj");
+            }
+
             break;
     }
 }
@@ -73,7 +91,7 @@ vec2_t project_ortho(vec3_t point) {
     // Convert 3D point to 2D on x and y axis
     vec2_t projected_point = {
         .x = (fov_factor * point.x),    // Multiply by field ov view factor to scale the point up
-        .y = (fov_factor * point.y)
+        .y = (fov_factor * point.z)
     };
 
     return projected_point;
@@ -96,8 +114,6 @@ vec2_t project(int view, vec3_t point) {
 
 void update() {
 
-    fov_factor = 128;
-
     time_to_wait = FRAME_TARGET_LENGTH - (SDL_GetTicks() - prev_frame_time);
     if(time_to_wait > 0 && time_to_wait <= FRAME_TARGET_LENGTH) {    // Delay execution until the time passed is the Frame Target Length
         SDL_Delay(time_to_wait);
@@ -109,12 +125,14 @@ void update() {
     triangles_to_render.clear();
 
     // Transformations to mesh
-    // mesh.rotation.x += 0.005;
-    mesh.rotation.y += 0.05;
+    mesh.rotation.x += 0.005;
+    // mesh.rotation.y += 0.01;
     // mesh.rotation.z += 0.005;
 
     // Loop through vertices and faces
+
     for(int i = 0; i < mesh.faces.size(); i++) {
+
         face_t current_face = mesh.faces[i];
         vec3_t face_vertices[3];
         face_vertices[0] = mesh.vertices[current_face.a - 1];   // our current face_t a index starts at 1, so we need to subtract 1 to compensate
@@ -125,16 +143,15 @@ void update() {
 
         // Loop through all vertices of the current face, apply any transformations, and project the points
         for(int j = 0; j < 3; j++) {
+
             vec3_t transformed_vertex = face_vertices[j];
+
             transformed_vertex = vec3_rotate_x(transformed_vertex, mesh.rotation.x);
             transformed_vertex = vec3_rotate_y(transformed_vertex, mesh.rotation.y);
             transformed_vertex = vec3_rotate_z(transformed_vertex, mesh.rotation.z);
 
             // Translate vertex away from camera in Z-axis if in Persp
-            if(view == 0) {
-                fov_factor = 512;
-                transformed_vertex.z -= 5;
-            }
+            transformed_vertex.z += camera_position.z;
 
             // Project current point
             vec2_t projected_point = project(view, transformed_vertex);
@@ -159,13 +176,14 @@ void render() {
 
     // Loop through array and render all projected triangles
     int size = triangles_to_render.size();
+
     for(int i = 0; i < size; i++) {
 
         // Draw all vertices
         triangle_t triangle = triangles_to_render[i];
-        draw_rect(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xFFFFFF00);
-        draw_rect(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xFFFFFF00);
-        draw_rect(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xFFFFFF00);
+        draw_rect(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xFFFF0000);
+        draw_rect(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xFFFF0000);
+        draw_rect(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xFFFF0000);
 
         // Draw unfilled triangle outline from vertices
         draw_triangle(
@@ -175,7 +193,7 @@ void render() {
             triangle.points[1].y,
             triangle.points[2].x,
             triangle.points[2].y,
-            0xFF00FF00
+            0xFFFFFF00
         );
     }
 
