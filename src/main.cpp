@@ -179,11 +179,7 @@ void render() {
 
     for(int i = 0; i < size; i++) {
 
-        // Draw all vertices
         triangle_t triangle = triangles_to_render[i];
-        draw_rect(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xFFFF0000);
-        draw_rect(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xFFFF0000);
-        draw_rect(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xFFFF0000);
 
         // Draw unfilled triangle outline from vertices
         draw_triangle(
@@ -195,6 +191,11 @@ void render() {
             triangle.points[2].y,
             0xFFFFFF00
         );
+
+        // Draw all vertices on top of edges
+        draw_rect(triangle.points[0].x, triangle.points[0].y, 5, 5, 0xFFFF0000);
+        draw_rect(triangle.points[1].x, triangle.points[1].y, 5, 5, 0xFFFF0000);
+        draw_rect(triangle.points[2].x, triangle.points[2].y, 5, 5, 0xFFFF0000);
     }
 
     // Free memory used by triangles_to_render array
