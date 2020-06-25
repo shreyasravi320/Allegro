@@ -17,6 +17,33 @@ typedef struct {
     float z;
 } vec3_t;
 
+// 2D Vector Functions
+float vec2_mag(vec2_t v);
+
+vec2_t vec2_add(vec2_t v1, vec2_t v2);
+
+vec2_t vec2_sub(vec2_t v1, vec2_t v2);
+
+vec2_t vec2_mul(vec2_t v, float c);
+
+vec2_t vec2_div(vec2_t v, float c);
+
+// Vector Dot Product formula
+// scalar dot_product = v1.x * v2.x + v1.y * v2.y
+
+float vec2_dot(vec2_t v1, vec2_t v2);
+
+// 3D Vector Functions
+float vec3_mag(vec3_t v);
+
+vec3_t vec3_add(vec3_t v1, vec3_t v2);
+
+vec3_t vec3_sub(vec3_t v1, vec3_t v2);
+
+vec3_t vec3_mul(vec3_t v, float c);
+
+vec3_t vec3_div(vec3_t v, float c);
+
 // Vector Rotation around Z-axis (Z position doesn't change)
 // Change variables to rotate around different axes
 // x = r cos(a)     y = r sin(a)
@@ -36,5 +63,20 @@ vec3_t vec3_rotate_x(vec3_t v, float theta);
 vec3_t vec3_rotate_y(vec3_t v, float theta);
 
 vec3_t vec3_rotate_z(vec3_t v, float theta);
+
+// Calculating Normal (Cross Product) of 2 Vectors
+// N = normal vector3D
+// v1 = vector3D 1, v2 = vector3D 2
+//
+// N.x = v1.y * v2.z - v1.z * v2.y
+// N.y = v1.z * v2.x - v2.z * v1.x
+// N.z = v1.x * v2.y - v2.x * v1.y
+
+vec3_t vec3_norm(vec3_t v1, vec3_t v2);
+
+// Vector Dot Product formula
+// scalar dot_product = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
+
+float vec3_dot(vec3_t v1, vec3_t v2);
 
 #endif

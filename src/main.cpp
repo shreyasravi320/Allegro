@@ -125,9 +125,9 @@ void update() {
     triangles_to_render.clear();
 
     // Transformations to mesh
-    mesh.rotation.x += 0.005;
-    // mesh.rotation.y += 0.01;
-    // mesh.rotation.z += 0.005;
+    mesh.rotation.x += 0.0075;
+    // mesh.rotation.y += 0.0075;
+    // mesh.rotation.z += 0.0075;
 
     // Loop through vertices and faces
 
