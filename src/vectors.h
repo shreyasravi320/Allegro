@@ -33,6 +33,11 @@ vec2_t vec2_div(vec2_t v, float c);
 
 float vec2_dot(vec2_t v1, vec2_t v2);
 
+// Get Unit Vector
+// unit = v/mag(v)
+
+void vec2_unit(vec2_t* v);
+
 // 3D Vector Functions
 float vec3_mag(vec3_t v);
 
@@ -78,5 +83,10 @@ vec3_t vec3_norm(vec3_t v1, vec3_t v2);
 // scalar dot_product = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
 
 float vec3_dot(vec3_t v1, vec3_t v2);
+
+// Get Unit Vector
+// unit = v/mag(v)
+
+void vec3_unit(vec3_t* v);
 
 #endif

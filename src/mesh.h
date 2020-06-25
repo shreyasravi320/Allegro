@@ -8,6 +8,7 @@
 #include <vector>
 #include "vectors.h"
 #include "triangle.h"
+#include "color.h"
 
 using namespace std;
 

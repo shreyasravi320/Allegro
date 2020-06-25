@@ -29,6 +29,12 @@ float vec2_dot(vec2_t v1, vec2_t v2) {
     return v1.x * v2.x + v1.y * v2.y;
 }
 
+void vec2_unit(vec2_t* v) {
+    float len = sqrt(v->x * v->x + v->y * v->y);
+    v->x /= len;
+    v->y /= len;
+}
+
 // 3D Vector Functions
 float vec3_mag(vec3_t v) {
     return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
@@ -93,4 +99,11 @@ vec3_t vec3_norm(vec3_t v1, vec3_t v2) {
 
 float vec3_dot(vec3_t v1, vec3_t v2) {
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
+void vec3_unit(vec3_t* v) {
+    float len = sqrt(v->x * v->x + v->y * v->y + v->z * v->z);
+    v->x /= len;
+    v->y /= len;
+    v->z /= len;
 }

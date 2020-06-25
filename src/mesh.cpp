@@ -19,23 +19,23 @@ vec3_t cube_vertices[N_CUBE_VERTICES] = {
 
 face_t cube_faces[N_CUBE_FACES] = {
     // front
-    { .a = 1, .b = 2, .c = 3 },
-    { .a = 1, .b = 3, .c = 4 },
+    { .a = 1, .b = 2, .c = 3, .color = red },
+    { .a = 1, .b = 3, .c = 4, .color = red },
     // right
-    { .a = 4, .b = 3, .c = 5 },
-    { .a = 4, .b = 5, .c = 6 },
+    { .a = 4, .b = 3, .c = 5, .color = yellow },
+    { .a = 4, .b = 5, .c = 6, .color = yellow },
     // back
-    { .a = 6, .b = 5, .c = 7 },
-    { .a = 6, .b = 7, .c = 8 },
+    { .a = 6, .b = 5, .c = 7, .color = green  },
+    { .a = 6, .b = 7, .c = 8, .color = green  },
     // left
-    { .a = 8, .b = 7, .c = 2 },
-    { .a = 8, .b = 2, .c = 1 },
+    { .a = 8, .b = 7, .c = 2, .color = blue  },
+    { .a = 8, .b = 2, .c = 1, .color = blue  },
     // top
-    { .a = 2, .b = 7, .c = 5 },
-    { .a = 2, .b = 5, .c = 3 },
+    { .a = 2, .b = 7, .c = 5, .color = purple  },
+    { .a = 2, .b = 5, .c = 3, .color = purple  },
     // bottom
-    { .a = 6, .b = 8, .c = 1 },
-    { .a = 6, .b = 1, .c = 4 }
+    { .a = 6, .b = 8, .c = 1, .color = pink  },
+    { .a = 6, .b = 1, .c = 4, .color = pink  }
 };
 
 void load_cube_mesh_data() {
@@ -106,53 +106,22 @@ void load_obj_mesh_data(string file) {
             char line_to_read[len + 1];
             strcpy(line_to_read, line2.c_str());
 
-            // Need to check if vertices are triangular or rectangular
-            int slash_count = 0;
-            for(string::size_type i = 0; i < line2.size(); i++) {
-                if(line2[i] == '/') slash_count++;
-            }
+            sscanf(
+                line_to_read, "f %d/%d/%d %d/%d/%d %d/%d/%d",
+                &vertex_indices[0], &texture_indices[0], &normal_indices[0],
+                &vertex_indices[1], &texture_indices[1], &normal_indices[1],
+                &vertex_indices[2], &texture_indices[2], &normal_indices[2]
+            );
 
-            if(slash_count == 6) {
-                sscanf(
-                    line_to_read, "f %d/%d/%d %d/%d/%d %d/%d/%d",
-                    &vertex_indices[0], &texture_indices[0], &normal_indices[0],
-                    &vertex_indices[1], &texture_indices[1], &normal_indices[1],
-                    &vertex_indices[2], &texture_indices[2], &normal_indices[2]
-                );
+            // Load the vertex indices into the face data structure
+            face_t face = {
+                .a = vertex_indices[0],
+                .b = vertex_indices[1],
+                .c = vertex_indices[2],
+                .color = gray
+            };
 
-                // Load the vertex indices into the face data structure
-                face_t face = {
-                    .a = vertex_indices[0],
-                    .b = vertex_indices[1],
-                    .c = vertex_indices[2]
-                };
-
-                mesh.faces.push_back(face);
-            }
-            else if(slash_count == 8) {
-                sscanf(
-                    line_to_read, "f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
-                    &vertex_indices[0], &texture_indices[0], &normal_indices[0],
-                    &vertex_indices[1], &texture_indices[1], &normal_indices[1],
-                    &vertex_indices[2], &texture_indices[2], &normal_indices[2],
-                    &vertex_indices[3], &texture_indices[3], &normal_indices[3]
-                );
-
-                // Load the vertex indices into the face data structure
-                face_t face1 = {
-                    .a = vertex_indices[0],
-                    .b = vertex_indices[1],
-                    .c = vertex_indices[2]
-                };
-                face_t face2 = {
-                    .a = vertex_indices[2],
-                    .b = vertex_indices[3],
-                    .c = vertex_indices[1]
-                };
-
-                mesh.faces.push_back(face1);
-                mesh.faces.push_back(face2);
-            }
+            mesh.faces.push_back(face);
         }
     }
 }
