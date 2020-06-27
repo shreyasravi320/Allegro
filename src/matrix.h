@@ -27,4 +27,8 @@ mat4_t mat4_rotate_x(float theta);
 
 mat4_t mat4_rotate_y(float theta);
 
+mat4_t mat4_project(float aspect, float fov, float z_near, float z_far);
+
+vec4_t mat4_persp_divide(mat4_t m_proj, vec4_t v);
+
 #endif

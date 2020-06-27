@@ -5,12 +5,13 @@
 #include "mesh.h"
 #include "color.h"
 #include "matrix.h"
-#include "animation.h"
 
 using namespace std;
 
+const float PI = 3.141592653589793238462;
+mat4_t proj_matrix;
 // Mode control
-// 1 = edge, 2 = edge + vertex, 3 = face + vertex , 4 = face + edge, 5 = face + vertex + edge
+// 1 = vertices, 2 = edge, 3 = face, 4 = vertex + edge, 5 = face + vertex, 6 = edge + face, 7 = face + vertex + edge
 // c = toggle backface culling
 
 int control = 0;
@@ -95,6 +96,13 @@ void setup() {
         win_height  // Height to apply over
     );
 
+    // Initialize the projection matrix
+    float aspect = (float) win_height / (float) win_width;
+    float fov = PI / 3.0;  // 60 degrees -> radians
+    float z_near = 0.1;   // random value
+    float z_far = 100.0; // also random value
+    proj_matrix = mat4_project(aspect, fov, z_near, z_far);
+
     // Loads the cube values in the mesh data structure
     // load_cube_mesh_data();
 
@@ -142,6 +150,14 @@ void process_input() {
                 control = 5;
             }
 
+            if(event.key.keysym.sym == SDLK_6) {
+                control = 6;
+            }
+
+            if(event.key.keysym.sym == SDLK_7) {
+                control = 7;
+            }
+
             if(event.key.keysym.sym == SDLK_c) {
                 cull++;
             }
@@ -154,31 +170,31 @@ void process_input() {
     }
 }
 
-// Orthographic
-vec2_t project_ortho(vec3_t point) {
-    // Convert 3D point to 2D on x and y axis
-    vec2_t projected_point = {
-        .x = (fov_factor * point.x),    // Multiply by field ov  factor to scale the point up
-        .y = (fov_factor * point.y)
-    };
-
-    return projected_point;
-}
-
-vec2_t project_persp(vec3_t point) {
-
-    // Convert 3D point to 2D on x and y axis
-    vec2_t projected_point = {
-        .x = (fov_factor * point.x / point.z),  // Similar triangles formula to scale down point in perspective
-        .y = (fov_factor * point.y / point.z)
-    };
-
-    return projected_point;
-}
-
-vec2_t project(vec3_t point) {
-    return project_persp(point);
-}
+// // Orthographic
+// vec2_t project_ortho(vec3_t point) {
+//     // Convert 3D point to 2D on x and y axis
+//     vec2_t projected_point = {
+//         .x = (fov_factor * point.x),    // Multiply by field ov  factor to scale the point up
+//         .y = (fov_factor * point.y)
+//     };
+//
+//     return projected_point;
+// }
+//
+// vec2_t project_persp(vec3_t point) {
+//
+//     // Convert 3D point to 2D on x and y axis
+//     vec2_t projected_point = {
+//         .x = (fov_factor * point.x / point.z),  // Similar triangles formula to scale down point in perspective
+//         .y = (fov_factor * point.y / point.z)
+//     };
+//
+//     return projected_point;
+// }
+//
+// vec2_t project(vec3_t point) {
+//     return project_persp(point);
+// }
 
 void update() {
 
@@ -193,17 +209,17 @@ void update() {
     triangles_to_render.clear();
 
     // Transformations to mesh
-    // mesh.rot.x += 0.0075;
+    mesh.rot.x += 0.0075;
     // mesh.rot.y += 0.0075;
     // mesh.rot.z += 0.0075;
 
-    mesh.scale.x = 0.5;
-    mesh.scale.y = 0.5;
-    mesh.scale.z = 0.5;
+    // mesh.scale.x = 0.5;
+    // mesh.scale.y = 0.5;
+    // mesh.scale.z = 0.5;
 
-    mesh.pos.x += 0.001;
+    // mesh.pos.x += 0.001;
     // mesh.pos.y += 0.002;
-    
+
     mesh.pos.z = 5;
 
     mat4_t scale_matrix = mat4_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
@@ -281,15 +297,19 @@ void update() {
             }
         }
 
-        vec2_t projected_points[3];
+        vec4_t projected_points[3];
         for(int j = 0; j < 3; j++) {
 
             // Project current point
-            projected_points[j] = project(vec4_to_vec3(transformed_vertices[j]));
+            projected_points[j] = mat4_persp_divide(proj_matrix, transformed_vertices[j]);
+
+            // Scale the points into view
+            projected_points[j].x *= win_width / 2.0;
+            projected_points[j].y *= win_height / 2.0;
 
             // Translate projected point to the middle of the screen
-            projected_points[j].x += win_width/2;
-            projected_points[j].y += win_height/2;
+            projected_points[j].x += win_width / 2.0;
+            projected_points[j].y += win_height / 2.0;
         }
 
         // Calculate average depth of each face so we can sort and render back to front
@@ -297,9 +317,9 @@ void update() {
 
         triangle_t projected_triangle = {
             .points = {
-                projected_points[0],
-                projected_points[1],
-                projected_points[2]
+                { projected_points[0].x, projected_points[0].y },
+                { projected_points[1].x, projected_points[1].y },
+                { projected_points[2].x, projected_points[2].y }
             },
             .color = current_face.color,
             .avg_depth = avg_depth
@@ -325,7 +345,7 @@ void render() {
 
         triangle_t triangle = triangles_to_render[i];
 
-        if(control == 0 || control == 3 || control == 4 || control == 5) {
+        if(control == 0 || control == 3 || control == 5 || control == 6 || control == 7) {
             // Draw filled triangle from vertices
             draw_filled_triangle(
                 triangle.points[0].x,
@@ -338,7 +358,7 @@ void render() {
             );
         }
 
-        if(control == 0 || control == 1 || control == 2 || control == 4 || control == 5) {
+        if(control == 0 || control == 2 || control == 4 || control == 6 || control == 7) {
             // Draw triangle edges from vertices
             draw_triangle(
                 triangle.points[0].x,
@@ -351,7 +371,7 @@ void render() {
             );
         }
 
-        if(control == 0 || control == 2 || control == 3 || control == 5) {
+        if(control == 0 || control == 1 || control == 4 || control == 5 || control == 7) {
             // Draw all vertices on top of edges
             draw_rect(triangle.points[0].x, triangle.points[0].y, 5, 5, red);
             draw_rect(triangle.points[1].x, triangle.points[1].y, 5, 5, red);

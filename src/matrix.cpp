@@ -101,7 +101,7 @@ mat4_t mat4_translate(float dx, float dy, float dz) {
 
     mat4_t m = mat4_identity();
     m.mat[0][3] = -dx;
-    m.mat[1][3] = -dy;
+    m.mat[1][3] = dy;
     m.mat[2][3] = -dz;
 
     return m;
@@ -180,4 +180,43 @@ mat4_t mat4_rotate_y(float theta) {
     m.mat[2][2] = c;
 
     return m;
+}
+
+// Create a projection matrix to normalize all x, y, and z values
+mat4_t mat4_project(float aspect, float fov, float z_near, float z_far) {
+
+    // | aspect * 1/tan(fov/2)             0             0                     0  |
+    // |                     0  1/tan(fov/2)             0                     0  |
+    // |                     0             0  zf/(zf - zn)  -(zf * zn)/(zf - zn)  |
+    // |                     0             0             1                     0  |
+
+    // Aspect ratio = height / width
+    // fov is the field of view angle - to normalize, multiply value by 1/tan(fov/2)
+    // z_far is the farthest z value that should be projected
+    // z_near is the closest z value on the screen
+    // There is a 1 in the w row because we will be storing the original z-value in that w component of the vector
+    // We have to store the original z-value for perspective divide, textures, and some other things
+
+    mat4_t m = {{{ 0 }}};
+    m.mat[0][0] = aspect * 1 / (tan(fov / 2));
+    m.mat[1][1] = 1 / (tan(fov / 2));
+    m.mat[2][2] = z_far / (z_far - z_near);
+    m.mat[2][3] = -(z_far * z_near) / (z_far - z_near);
+    m.mat[3][2] = 1;
+    return m;
+}
+
+// Perform perspective divide using the projection matrix
+vec4_t mat4_persp_divide(mat4_t m_proj, vec4_t v) {
+
+    // Multiply projection matrix by original vector
+    vec4_t result = mat4_mul_vec4(m_proj, v);
+
+    // Divide by original z-value (stored in w component) to perform perspective divide
+    if(result.w != 0.0) {
+        result.x /= result.w;
+        result.y /= result.w;
+        result.z /= result.w;
+    }
+    return result;
 }

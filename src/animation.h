@@ -4,6 +4,7 @@
 #include <iostream>
 #include "vectors.h"
 #include "matrix.h"
+#include "mesh.h"
 
 using namespace std;
 
