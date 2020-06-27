@@ -4,6 +4,8 @@
 #include "display.h"
 #include "mesh.h"
 #include "color.h"
+#include "matrix.h"
+#include "animation.h"
 
 using namespace std;
 
@@ -13,6 +15,7 @@ using namespace std;
 
 int control = 0;
 int cull = 0;
+float current_frame = 0;
 
 vector<triangle_t> triangles_to_render;  // Need dynamically allocated memory since each mesh has different size
 
@@ -96,7 +99,7 @@ void setup() {
     // load_cube_mesh_data();
 
     // Load the obj mesh data
-    load_obj_mesh_data("./models/suzanne.obj");
+    load_obj_mesh_data("./models/sphere.obj");
 }
 
 void process_input() {
@@ -190,9 +193,24 @@ void update() {
     triangles_to_render.clear();
 
     // Transformations to mesh
-    mesh.rotation.x += 0.0075;
-    mesh.rotation.y += 0.0075;
-    mesh.rotation.z += 0.0075;
+    // mesh.rot.x += 0.0075;
+    // mesh.rot.y += 0.0075;
+    // mesh.rot.z += 0.0075;
+
+    mesh.scale.x = 0.5;
+    mesh.scale.y = 0.5;
+    mesh.scale.z = 0.5;
+
+    mesh.pos.x += 0.001;
+    // mesh.pos.y += 0.002;
+    
+    mesh.pos.z = 5;
+
+    mat4_t scale_matrix = mat4_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
+    mat4_t translate_matrix = mat4_translate(mesh.pos.x, mesh.pos.y, mesh.pos.z);
+    mat4_t rotate_x_matrix = mat4_rotate_x(mesh.rot.x);
+    mat4_t rotate_y_matrix = mat4_rotate_y(mesh.rot.y);
+    mat4_t rotate_z_matrix = mat4_rotate_z(mesh.rot.z);
 
     // Loop through vertices and faces
 
@@ -207,18 +225,24 @@ void update() {
 
         // Loop through all vertices of the current face, apply any transformations, and project the points
 
-        vec3_t transformed_vertices[3];
+        vec4_t transformed_vertices[3];
 
         for(int j = 0; j < 3; j++) {
 
-            vec3_t transformed_vertex = face_vertices[j];
+            vec4_t transformed_vertex = vec4_from_vec3(face_vertices[j]);
 
-            transformed_vertex = vec3_rotate_x(transformed_vertex, mesh.rotation.x);
-            transformed_vertex = vec3_rotate_y(transformed_vertex, mesh.rotation.y);
-            transformed_vertex = vec3_rotate_z(transformed_vertex, mesh.rotation.z);
+            // Use matrices for transformations instead of manual transformations
+            // Create world matrix that combines scale, rotation, and translation matrices
+            mat4_t world_matrix = mat4_identity();
+            world_matrix = mat4_mul_mat(scale_matrix, world_matrix);
+            world_matrix = mat4_mul_mat(rotate_x_matrix, world_matrix);
+            world_matrix = mat4_mul_mat(rotate_y_matrix, world_matrix);
+            world_matrix = mat4_mul_mat(rotate_z_matrix, world_matrix);
+            world_matrix = mat4_mul_mat(translate_matrix, world_matrix);
 
-            // Translate vertex towards from camera in Z-axis if in Persp
-            transformed_vertex.z -= 5;
+            // Multiply world matrix by original vector
+            transformed_vertex = mat4_mul_vec4(world_matrix, transformed_vertex);
+
             transformed_vertices[j] = transformed_vertex;
         }
 
@@ -232,9 +256,9 @@ void update() {
         // | /
         // C
         if(cull % 2 == 0) {
-            vec3_t a = transformed_vertices[0];
-            vec3_t b = transformed_vertices[1];
-            vec3_t c = transformed_vertices[2];
+            vec3_t a = vec4_to_vec3(transformed_vertices[0]);
+            vec3_t b = vec4_to_vec3(transformed_vertices[1]);
+            vec3_t c = vec4_to_vec3(transformed_vertices[2]);
 
             // Vector subtraction to get b-a and c-a -> use those to calculate normal
             vec3_t ab = vec3_sub(a, b);
@@ -261,7 +285,7 @@ void update() {
         for(int j = 0; j < 3; j++) {
 
             // Project current point
-            projected_points[j] = project(transformed_vertices[j]);
+            projected_points[j] = project(vec4_to_vec3(transformed_vertices[j]));
 
             // Translate projected point to the middle of the screen
             projected_points[j].x += win_width/2;

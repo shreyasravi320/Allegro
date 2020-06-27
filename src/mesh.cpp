@@ -3,7 +3,9 @@
 using namespace std;
 
 mesh_t mesh = {
-    .rotation = { .x = 0, .y = 0, .z = 0 }
+    .rot = { .x = 0, .y = 0, .z = 0 },
+    .scale = { .x = 1, .y = 1, .z = 1 },
+    .pos = { .x = 0, .y = 0, .z = 0 }
 };
 
 vec3_t cube_vertices[N_CUBE_VERTICES] = {

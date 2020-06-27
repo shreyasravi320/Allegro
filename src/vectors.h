@@ -17,6 +17,13 @@ typedef struct {
     float z;
 } vec3_t;
 
+typedef struct {
+    float x;
+    float y;
+    float z;
+    float w;
+} vec4_t;
+
 // 2D Vector Functions
 float vec2_mag(vec2_t v);
 
@@ -88,5 +95,10 @@ float vec3_dot(vec3_t v1, vec3_t v2);
 // unit = v/mag(v)
 
 void vec3_unit(vec3_t* v);
+
+// Vector 4 functions
+vec4_t vec4_from_vec3(vec3_t v);
+
+vec3_t vec4_to_vec3(vec4_t v);
 
 #endif

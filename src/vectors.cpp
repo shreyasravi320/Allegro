@@ -107,3 +107,13 @@ void vec3_unit(vec3_t* v) {
     v->y /= len;
     v->z /= len;
 }
+
+vec4_t vec4_from_vec3(vec3_t v) {
+    vec4_t result = { .x = v.x, .y = v.y, .z = v.z, .w = 1 };
+    return result;
+}
+
+vec3_t vec4_to_vec3(vec4_t v) {
+    vec3_t result = { .x = v.x, .y = v.y, .z = v.z };
+    return result;
+}
