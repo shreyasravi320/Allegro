@@ -120,11 +120,11 @@ void draw_line(int x0, int y0, int x1, int y1, uint32_t color) {
 
     int side_length = (abs(x) >= abs(y)) ? abs(x) : abs(y);     // side length = abs(x) if abs(x) >= abs(y) otherwise it equals abs(y)
 
-    float dx = x / (float) side_length;
-    float dy = y / (float) side_length;
+    double dx = x / (double) side_length;
+    double dy = y / (double) side_length;
 
-    float current_x = x0;
-    float current_y = y0;
+    double current_x = x0;
+    double current_y = y0;
 
     for(int i = 0; i <= side_length; i++) {
         draw_pixel(round(current_x), round(current_y), color);  // Round because we can't have decimal pixels
@@ -161,12 +161,12 @@ void int_swap(int* a, int* b) {
 void fill_flat_bottom(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
 
     // Find the two slopes (two triangle legs)
-    float inv_slope_1 = (float)(x1 - x0) / (y1 - y0);
-    float inv_slope_2 = (float)(x2 - x0) / (y2 - y0);
+    double inv_slope_1 = (double)(x1 - x0) / (y1 - y0);
+    double inv_slope_2 = (double)(x2 - x0) / (y2 - y0);
 
     // Start x_start and x_end from the top vertex (x0,y0)
-    float x_start = x0;
-    float x_end = x0;
+    double x_start = x0;
+    double x_end = x0;
 
     // Loop all the scanlines from top to bottom
     for (int y = y0; y <= y2; y++) {
@@ -190,12 +190,12 @@ void fill_flat_bottom(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t c
 void fill_flat_top(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
 
     // Find the two slopes (two triangle legs)
-    float inv_slope_1 = (float)(x2 - x0) / (y2 - y0);
-    float inv_slope_2 = (float)(x2 - x1) / (y2 - y1);
+    double inv_slope_1 = (double)(x2 - x0) / (y2 - y0);
+    double inv_slope_2 = (double)(x2 - x1) / (y2 - y1);
 
     // Start x_start and x_end from the bottom vertex (x2,y2)
-    float x_start = x2;
-    float x_end = x2;
+    double x_start = x2;
+    double x_end = x2;
 
     // Loop all the scanlines from bottom to top
     for (int y = y2; y >= y0; y--) {

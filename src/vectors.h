@@ -7,38 +7,38 @@
 using namespace std;
 
 typedef struct {
-    float x;
-    float y;
+    double x;
+    double y;
 } vec2_t;
 
 typedef struct {
-    float x;
-    float y;
-    float z;
+    double x;
+    double y;
+    double z;
 } vec3_t;
 
 typedef struct {
-    float x;
-    float y;
-    float z;
-    float w;
+    double x;
+    double y;
+    double z;
+    double w;
 } vec4_t;
 
 // 2D Vector Functions
-float vec2_mag(vec2_t v);
+double vec2_mag(vec2_t v);
 
 vec2_t vec2_add(vec2_t v1, vec2_t v2);
 
 vec2_t vec2_sub(vec2_t v1, vec2_t v2);
 
-vec2_t vec2_mul(vec2_t v, float c);
+vec2_t vec2_mul(vec2_t v, double c);
 
-vec2_t vec2_div(vec2_t v, float c);
+vec2_t vec2_div(vec2_t v, double c);
 
 // Vector Dot Product formula
 // scalar dot_product = v1.x * v2.x + v1.y * v2.y
 
-float vec2_dot(vec2_t v1, vec2_t v2);
+double vec2_dot(vec2_t v1, vec2_t v2);
 
 // Get Unit Vector
 // unit = v/mag(v)
@@ -46,15 +46,15 @@ float vec2_dot(vec2_t v1, vec2_t v2);
 void vec2_unit(vec2_t* v);
 
 // 3D Vector Functions
-float vec3_mag(vec3_t v);
+double vec3_mag(vec3_t v);
 
 vec3_t vec3_add(vec3_t v1, vec3_t v2);
 
 vec3_t vec3_sub(vec3_t v1, vec3_t v2);
 
-vec3_t vec3_mul(vec3_t v, float c);
+vec3_t vec3_mul(vec3_t v, double c);
 
-vec3_t vec3_div(vec3_t v, float c);
+vec3_t vec3_div(vec3_t v, double c);
 
 // Vector Rotation around Z-axis (Z position doesn't change)
 // Change variables to rotate around different axes
@@ -70,11 +70,11 @@ vec3_t vec3_div(vec3_t v, float c);
 // y' = [r sin(a)]cos(b) + [r cos(a)]sin(b)
 // y' = y cos(b) + x sin(b)
 
-vec3_t vec3_rotate_x(vec3_t v, float theta);
+vec3_t vec3_rotate_x(vec3_t v, double theta);
 
-vec3_t vec3_rotate_y(vec3_t v, float theta);
+vec3_t vec3_rotate_y(vec3_t v, double theta);
 
-vec3_t vec3_rotate_z(vec3_t v, float theta);
+vec3_t vec3_rotate_z(vec3_t v, double theta);
 
 // Calculating Normal (Cross Product) of 2 Vectors
 // N = normal vector3D
@@ -89,7 +89,7 @@ vec3_t vec3_norm(vec3_t v1, vec3_t v2);
 // Vector Dot Product formula
 // scalar dot_product = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
 
-float vec3_dot(vec3_t v1, vec3_t v2);
+double vec3_dot(vec3_t v1, vec3_t v2);
 
 // Get Unit Vector
 // unit = v/mag(v)

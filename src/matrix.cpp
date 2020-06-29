@@ -54,7 +54,7 @@ mat4_t mat4_mul_mat(mat4_t a, mat4_t b) {
 }
 
 // Create a matrix for scaling vertices
-mat4_t mat4_scale(float sx, float sy, float sz) {
+mat4_t mat4_scale(double sx, double sy, double sz) {
     // | sx  0  0  0 |
     // |  0 sy  0  0 |
     // |  0  0 sz  0 |
@@ -81,7 +81,7 @@ mat4_t mat4_scale(float sx, float sy, float sz) {
 }
 
 // Create a matrix for translating vertices
-mat4_t mat4_translate(float dx, float dy, float dz) {
+mat4_t mat4_translate(double dx, double dy, double dz) {
     // |  1  0  0 dx |
     // |  0  1  0 dy |
     // |  0  0  1 dz |
@@ -108,9 +108,9 @@ mat4_t mat4_translate(float dx, float dy, float dz) {
 }
 
 // Create a matrix for translating vertices around z axis
-mat4_t mat4_rotate_z(float theta) {
-    float c = cos(theta);
-    float s = sin(theta);
+mat4_t mat4_rotate_z(double theta) {
+    double c = cos(theta);
+    double s = sin(theta);
 
     // |  c -s  0  0  |
     // |  s  c  0  0  |
@@ -125,17 +125,17 @@ mat4_t mat4_rotate_z(float theta) {
 
     mat4_t m = mat4_identity();
     m.mat[0][0] = c;
-    m.mat[0][1] = -s;
-    m.mat[1][0] = s;
+    m.mat[0][1] = s;
+    m.mat[1][0] = -s;
     m.mat[1][1] = c;
 
     return m;
 }
 
 // Create a matrix for translating vertices around x axis
-mat4_t mat4_rotate_x(float theta) {
-    float c = cos(theta);
-    float s = sin(theta);
+mat4_t mat4_rotate_x(double theta) {
+    double c = cos(theta);
+    double s = sin(theta);
 
     // |  1  0  0  0  |
     // |  0  c -s  0  |
@@ -158,9 +158,9 @@ mat4_t mat4_rotate_x(float theta) {
 }
 
 // Create a matrix for translating vertices around y axis
-mat4_t mat4_rotate_y(float theta) {
-    float c = cos(theta);
-    float s = sin(theta);
+mat4_t mat4_rotate_y(double theta) {
+    double c = cos(theta);
+    double s = sin(theta);
 
     // |  c  0 -s  0  |
     // |  0  1  0  0  |
@@ -183,7 +183,7 @@ mat4_t mat4_rotate_y(float theta) {
 }
 
 // Create a projection matrix to normalize all x, y, and z values
-mat4_t mat4_project(float aspect, float fov, float z_near, float z_far) {
+mat4_t mat4_project(double aspect, double fov, double z_near, double z_far) {
 
     // | aspect * 1/tan(fov/2)             0             0                     0  |
     // |                     0  1/tan(fov/2)             0                     0  |

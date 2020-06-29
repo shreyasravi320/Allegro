@@ -2,21 +2,34 @@
 
 using namespace std;
 
+vec3_t default_pos = { .x = -4, .y = 0, .z = 15 };
+vec3_t default_scale = { .x = 1, .y = 1, .z = 1 };
+vec3_t default_rot = { .x = 0, .y = 0, .z = 0 };
+
 mesh_t mesh = {
-    .rot = { .x = 0, .y = 0, .z = 0 },
-    .scale = { .x = 1, .y = 1, .z = 1 },
-    .pos = { .x = 0, .y = 0, .z = 0 }
+    .rot = default_rot,
+    .scale = default_scale,
+    .pos = default_pos
 };
 
 vec3_t cube_vertices[N_CUBE_VERTICES] = {
-    { .x = -1, .y = -1, .z = -1 }, // 1
-    { .x = -1, .y =  1, .z = -1 }, // 2
-    { .x =  1, .y =  1, .z = -1 }, // 3
-    { .x =  1, .y = -1, .z = -1 }, // 4
-    { .x =  1, .y =  1, .z =  1 }, // 5
-    { .x =  1, .y = -1, .z =  1 }, // 6
-    { .x = -1, .y =  1, .z =  1 }, // 7
-    { .x = -1, .y = -1, .z =  1 }  // 8
+    // { .x = -1, .y = -1, .z = -1 }, // 1
+    // { .x = -1, .y =  1, .z = -1 }, // 2
+    // { .x =  1, .y =  1, .z = -1 }, // 3
+    // { .x =  1, .y = -1, .z = -1 }, // 4
+    // { .x =  1, .y =  1, .z =  1 }, // 5
+    // { .x =  1, .y = -1, .z =  1 }, // 6
+    // { .x = -1, .y =  1, .z =  1 }, // 7
+    // { .x = -1, .y = -1, .z =  1 }  // 8
+
+    { .x =  1, .y = -1, .z =  1 }, // 6 -> 1
+    { .x =  1, .y =  1, .z =  1 }, // 5 -> 2
+    { .x = -1, .y =  1, .z =  1 }, // 7 -> 3
+    { .x = -1, .y = -1, .z =  1 }, // 8 -> 4
+    { .x = -1, .y =  1, .z = -1 }, // 2 -> 5
+    { .x = -1, .y = -1, .z = -1 }, // 1 -> 6
+    { .x =  1, .y =  1, .z = -1 }, // 3 -> 7
+    { .x =  1, .y = -1, .z = -1 }  // 4 -> 8
 };
 
 face_t cube_faces[N_CUBE_FACES] = {
@@ -27,17 +40,17 @@ face_t cube_faces[N_CUBE_FACES] = {
     { .a = 4, .b = 3, .c = 5, .color = yellow },
     { .a = 4, .b = 5, .c = 6, .color = yellow },
     // back
-    { .a = 6, .b = 5, .c = 7, .color = green  },
-    { .a = 6, .b = 7, .c = 8, .color = green  },
+    { .a = 6, .b = 5, .c = 7, .color = green },
+    { .a = 6, .b = 7, .c = 8, .color = green },
     // left
-    { .a = 8, .b = 7, .c = 2, .color = blue  },
-    { .a = 8, .b = 2, .c = 1, .color = blue  },
+    { .a = 8, .b = 7, .c = 2, .color = blue },
+    { .a = 8, .b = 2, .c = 1, .color = blue },
     // top
-    { .a = 2, .b = 7, .c = 5, .color = purple  },
-    { .a = 2, .b = 5, .c = 3, .color = purple  },
+    { .a = 2, .b = 7, .c = 5, .color = white },
+    { .a = 2, .b = 5, .c = 3, .color = white },
     // bottom
-    { .a = 6, .b = 8, .c = 1, .color = pink  },
-    { .a = 6, .b = 1, .c = 4, .color = pink  }
+    { .a = 6, .b = 8, .c = 1, .color = black },
+    { .a = 6, .b = 1, .c = 4, .color = black }
 };
 
 void load_cube_mesh_data() {
@@ -82,7 +95,7 @@ void load_obj_mesh_data(string file) {
             int len = line1.length();
             char line_to_read[len + 1];
             strcpy(line_to_read, line1.c_str());
-            sscanf(line_to_read, "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
+            sscanf(line_to_read, "v %lf %lf %lf", &vertex.x, &vertex.y, &vertex.z);
             mesh.vertices.push_back(vertex);
             // cout << mesh.vertices.back().x << " " << mesh.vertices.back().y << " " << mesh.vertices.back().z << endl;
         }
@@ -120,7 +133,7 @@ void load_obj_mesh_data(string file) {
                 .a = vertex_indices[0],
                 .b = vertex_indices[1],
                 .c = vertex_indices[2],
-                .color = gray
+                .color = white
             };
 
             mesh.faces.push_back(face);

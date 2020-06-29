@@ -32,6 +32,10 @@ typedef struct {
 // Global mesh variable
 extern mesh_t mesh;
 
+extern vec3_t default_pos;
+extern vec3_t default_scale;
+extern vec3_t default_rot;
+
 void load_cube_mesh_data();
 
 void load_obj_mesh_data(string file);

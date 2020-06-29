@@ -5,10 +5,12 @@
 #include "mesh.h"
 #include "color.h"
 #include "matrix.h"
+#include "light.h"
+#include "animation.h"
 
 using namespace std;
 
-const float PI = 3.141592653589793238462;
+const double PI = 3.141592653589793238462;
 mat4_t proj_matrix;
 // Mode control
 // 1 = vertices, 2 = edge, 3 = face, 4 = vertex + edge, 5 = face + vertex, 6 = edge + face, 7 = face + vertex + edge
@@ -16,14 +18,14 @@ mat4_t proj_matrix;
 
 int control = 0;
 int cull = 0;
-float current_frame = 0;
+double current_frame = 0;
 
 vector<triangle_t> triangles_to_render;  // Need dynamically allocated memory since each mesh has different size
 
 bool is_running = false;
 
 // Field of  factor to scale up points
-float fov_factor = 1024;
+double fov_factor = 1024;
 
 // Camera origin
 vec3_t camera_position = { .x = 0, .y = 0, .z = 0 };
@@ -97,10 +99,10 @@ void setup() {
     );
 
     // Initialize the projection matrix
-    float aspect = (float) win_height / (float) win_width;
-    float fov = PI / 3.0;  // 60 degrees -> radians
-    float z_near = 0.1;   // random value
-    float z_far = 100.0; // also random value
+    double aspect = (double) win_height / (double) win_width;
+    double fov = PI / 6;  // 90 degrees -> radians
+    double z_near = 0.1;   // random value
+    double z_far = 100.0; // also random value
     proj_matrix = mat4_project(aspect, fov, z_near, z_far);
 
     // Loads the cube values in the mesh data structure
@@ -170,31 +172,31 @@ void process_input() {
     }
 }
 
-// // Orthographic
-// vec2_t project_ortho(vec3_t point) {
-//     // Convert 3D point to 2D on x and y axis
-//     vec2_t projected_point = {
-//         .x = (fov_factor * point.x),    // Multiply by field ov  factor to scale the point up
-//         .y = (fov_factor * point.y)
-//     };
-//
-//     return projected_point;
-// }
-//
-// vec2_t project_persp(vec3_t point) {
-//
-//     // Convert 3D point to 2D on x and y axis
-//     vec2_t projected_point = {
-//         .x = (fov_factor * point.x / point.z),  // Similar triangles formula to scale down point in perspective
-//         .y = (fov_factor * point.y / point.z)
-//     };
-//
-//     return projected_point;
-// }
-//
-// vec2_t project(vec3_t point) {
-//     return project_persp(point);
-// }
+// Orthographic
+vec2_t project_ortho(vec3_t point) {
+    // Convert 3D point to 2D on x and y axis
+    vec2_t projected_point = {
+        .x = (fov_factor * point.x),    // Multiply by field ov  factor to scale the point up
+        .y = (fov_factor * point.y)
+    };
+
+    return projected_point;
+}
+
+vec2_t project_persp(vec3_t point) {
+
+    // Convert 3D point to 2D on x and y axis
+    vec2_t projected_point = {
+        .x = (fov_factor * point.x / point.z),  // Similar triangles formula to scale down point in perspective
+        .y = (fov_factor * point.y / point.z)
+    };
+
+    return projected_point;
+}
+
+vec2_t project(vec3_t point) {
+    return project_persp(point);
+}
 
 void update() {
 
@@ -208,19 +210,13 @@ void update() {
     // Initialize triangle array
     triangles_to_render.clear();
 
-    // Transformations to mesh
-    mesh.rot.x += 0.0075;
-    // mesh.rot.y += 0.0075;
-    // mesh.rot.z += 0.0075;
+    // Perform Animations
+    mesh.scale.x = 0.5;
+    mesh.scale.y = 0.5;
+    mesh.scale.z = 0.5;
 
-    // mesh.scale.x = 0.5;
-    // mesh.scale.y = 0.5;
-    // mesh.scale.z = 0.5;
-
-    // mesh.pos.x += 0.001;
-    // mesh.pos.y += 0.002;
-
-    mesh.pos.z = 5;
+    // anim_sin(mesh.pos.y, current_frame++, 0.1);
+    anim_parabola(mesh, -4, -1, 0, 30);
 
     mat4_t scale_matrix = mat4_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
     mat4_t translate_matrix = mat4_translate(mesh.pos.x, mesh.pos.y, mesh.pos.z);
@@ -271,7 +267,6 @@ void update() {
         // |  /
         // | /
         // C
-        if(cull % 2 == 0) {
             vec3_t a = vec4_to_vec3(transformed_vertices[0]);
             vec3_t b = vec4_to_vec3(transformed_vertices[1]);
             vec3_t c = vec4_to_vec3(transformed_vertices[2]);
@@ -292,6 +287,8 @@ void update() {
 
             // Check if dotproduct between normal and camera ray to vector a is < 0
             vec3_t camera_ray = vec3_sub(camera_position, a);
+
+        if(cull % 2 == 0) {
             if(vec3_dot(norm, camera_ray) < 0) {
                 continue;   // Bypass the rest of the for loop and restart
             }
@@ -313,7 +310,11 @@ void update() {
         }
 
         // Calculate average depth of each face so we can sort and render back to front
-        float avg_depth = (transformed_vertices[0].z + transformed_vertices[1].z + transformed_vertices[2].z) / 3.0;
+        double avg_depth = (transformed_vertices[0].z + transformed_vertices[1].z + transformed_vertices[2].z) / 3.0;
+
+        uint32_t face_color = current_face.color;
+        // Flat shading: color the triangle face based on the alignment of face normal and light ray
+        face_color = shade_flat(norm, world_light, face_color);
 
         triangle_t projected_triangle = {
             .points = {
@@ -321,7 +322,7 @@ void update() {
                 { projected_points[1].x, projected_points[1].y },
                 { projected_points[2].x, projected_points[2].y }
             },
-            .color = current_face.color,
+            .color = face_color,
             .avg_depth = avg_depth
         };
 
@@ -405,12 +406,27 @@ int main() {
     is_running = init_window();
 
     setup();
+    // double sum;
+    // double sub;
+    // int i = 0;
 
     while(is_running) {
+        // auto start = chrono::high_resolution_clock::now();
+
         process_input();
         update();
         render();
+
+        // auto stop = chrono::high_resolution_clock::now();
+        // auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+        // if(i == 0) {
+        //     sub = duration.count();
+        // }
+        // i++;
+        // sum += duration.count();
+        // cout << duration.count() << endl;
     }
+    // cout << (sum - sub) / (pow(10, 6)) << " seconds" << endl;
 
     quit();
     free_resources();
