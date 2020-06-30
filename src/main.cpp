@@ -7,6 +7,7 @@
 #include "matrix.h"
 #include "light.h"
 #include "animation.h"
+#include "textures.h"
 
 using namespace std;
 
@@ -14,6 +15,7 @@ const double PI = 3.141592653589793238462;
 mat4_t proj_matrix;
 // Mode control
 // 1 = vertices, 2 = edge, 3 = face, 4 = vertex + edge, 5 = face + vertex, 6 = edge + face, 7 = face + vertex + edge
+// 8 = textures, 9 = textures + edges, 0 = vertex + edge + textures
 // c = toggle backface culling
 
 int control = 0;
@@ -105,11 +107,16 @@ void setup() {
     double z_far = 100.0; // also random value
     proj_matrix = mat4_project(aspect, fov, z_near, z_far);
 
+    // Manually load hardcoded texture values
+    mesh_texture = (uint32_t*) RED_BRICK_TEXTURE;
+    tex_width = 64;
+    tex_height = 64;
+
     // Loads the cube values in the mesh data structure
-    // load_cube_mesh_data();
+    load_cube_mesh_data();
 
     // Load the obj mesh data
-    load_obj_mesh_data("./models/sphere.obj");
+    // load_obj_mesh_data("./models/sphere.obj");
 }
 
 void process_input() {
@@ -158,6 +165,14 @@ void process_input() {
 
             if(event.key.keysym.sym == SDLK_7) {
                 control = 7;
+            }
+
+            if(event.key.keysym.sym == SDLK_8) {
+                control = 8;
+            }
+
+            if(event.key.keysym.sym == SDLK_9) {
+                control = 9;
             }
 
             if(event.key.keysym.sym == SDLK_c) {
@@ -211,12 +226,13 @@ void update() {
     triangles_to_render.clear();
 
     // Perform Animations
-    mesh.scale.x = 0.5;
-    mesh.scale.y = 0.5;
-    mesh.scale.z = 0.5;
+    // mesh.scale.x = 0.5;
+    // mesh.scale.y = 0.5;
+    // mesh.scale.z = 0.5;
+    // //
+    // anim_bounce(mesh, default_pos.x, 3, -14, default_pos.z, 30, 15, 30, ++current_frame);
 
-    // anim_sin(mesh.pos.y, current_frame++, 0.1);
-    anim_parabola(mesh, -4, -1, 0, 30);
+    mesh.rot.x += 0.01;
 
     mat4_t scale_matrix = mat4_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
     mat4_t translate_matrix = mat4_translate(mesh.pos.x, mesh.pos.y, mesh.pos.z);
@@ -322,6 +338,11 @@ void update() {
                 { projected_points[1].x, projected_points[1].y },
                 { projected_points[2].x, projected_points[2].y }
             },
+            .tex_coords = {
+                { current_face.a_uv.u, current_face.a_uv.v },
+                { current_face.b_uv.u, current_face.b_uv.v },
+                { current_face.c_uv.u, current_face.c_uv.v }
+            },
             .color = face_color,
             .avg_depth = avg_depth
         };
@@ -359,8 +380,34 @@ void render() {
             );
         }
 
-        if(control == 0 || control == 2 || control == 4 || control == 6 || control == 7) {
+        if(control == 0 || control == 8 || control == 9) {
+            // Draw textured triangle from vertices
+            draw_textured_triangle(
+                triangle.points[0].x,
+                triangle.points[0].y,
+                triangle.tex_coords[0].u,
+                triangle.tex_coords[0].v,
+                triangle.points[1].x,
+                triangle.points[1].y,
+                triangle.tex_coords[1].u,
+                triangle.tex_coords[1].v,
+                triangle.points[2].x,
+                triangle.points[2].y,
+                triangle.tex_coords[2].u,
+                triangle.tex_coords[2].v,
+                mesh_texture
+            );
+        }
+
+        if(control == 0 || control == 2 || control == 4 || control == 6 || control == 7 || control == 9) {
             // Draw triangle edges from vertices
+            uint32_t edge_color;
+            if(control == 2 || control == 4 || control == 8) {
+                edge_color = white;
+            }
+            else {
+                edge_color = black;
+            }
             draw_triangle(
                 triangle.points[0].x,
                 triangle.points[0].y,
@@ -368,7 +415,7 @@ void render() {
                 triangle.points[1].y,
                 triangle.points[2].x,
                 triangle.points[2].y,
-                black
+                edge_color
             );
         }
 

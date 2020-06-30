@@ -4,6 +4,9 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "color.h"
+#include "swap.h"
+#include "vectors.h"
+#include "textures.h"
 
 // Global variables
 // Extern: initialized outside of header file
@@ -47,6 +50,10 @@ void fill_flat_top(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t colo
 void int_swap(int* a, int* b);
 
 void draw_filled_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color);
+
+void draw_texel(int x, int y, vec2_t a, vec2_t b, vec2_t c, uint32_t* texture);
+
+void draw_textured_triangle(int x0, int y0, double u0, double v0, int x1, int y1, double u1, double v1, int x2, int y2, double u2, double v2, uint32_t* texture);
 
 void draw_rect(int x, int y, int width, int height, uint32_t color);
 

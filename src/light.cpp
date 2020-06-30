@@ -9,9 +9,9 @@ light_t world_light = {
 
 uint32_t calculate_shading(uint32_t original_color, double shading_factor) {
     uint32_t a = (original_color & 0xFF000000);
-    uint32_t r = (original_color & 0x00FF0000) * pow(shading_factor, 2);
-    uint32_t g = (original_color & 0x0000FF00) * pow(shading_factor, 2);
-    uint32_t b = (original_color & 0x000000FF) * pow(shading_factor, 2);
+    uint32_t r = (original_color & 0x00FF0000) * pow(shading_factor, 1);
+    uint32_t g = (original_color & 0x0000FF00) * pow(shading_factor, 1);
+    uint32_t b = (original_color & 0x000000FF) * pow(shading_factor, 1);
 
     return a | (r & 0x00FF0000) | (g & 0x0000FF00) | (b & 0x000000FF);
 }
