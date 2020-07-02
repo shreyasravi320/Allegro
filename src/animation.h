@@ -2,6 +2,7 @@
 #define ANIMATION_H
 
 #include <iostream>
+#include <vector>
 #include "vectors.h"
 #include "matrix.h"
 #include "mesh.h"
@@ -19,5 +20,7 @@ void anim_parabola(mesh_t& mesh, double xs, double max_h, double xe, double zs, 
 void anim_bounce(mesh_t& mesh, double xs, double max_h, double xe, double zs, double ze, int bounces, double frames, double current_frame);
 
 void anim_sin(double& value, double frame, double speed);
+
+
 
 #endif

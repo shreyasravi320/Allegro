@@ -38,6 +38,6 @@ extern vec3_t default_rot;
 
 void load_cube_mesh_data();
 
-void load_obj_mesh_data(string file);
+mesh_t load_obj_mesh_data(mesh_t mesh, string file);
 
 #endif

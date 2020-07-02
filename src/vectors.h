@@ -101,4 +101,6 @@ vec4_t vec4_from_vec3(vec3_t v);
 
 vec3_t vec4_to_vec3(vec4_t v);
 
+vec2_t vec4_to_vec2(vec4_t v);
+
 #endif

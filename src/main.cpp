@@ -7,11 +7,19 @@
 #include "matrix.h"
 #include "light.h"
 #include "animation.h"
-#include "textures.h"
+#include "simulations.h"
 
 using namespace std;
 
 const double PI = 3.141592653589793238462;
+
+wave_t wave;
+mesh_t mesh = {
+    .rot = default_rot,
+    .scale = default_scale,
+    .pos = default_pos
+};
+
 mat4_t proj_matrix;
 // Mode control
 // 1 = vertices, 2 = edge, 3 = face, 4 = vertex + edge, 5 = face + vertex, 6 = edge + face, 7 = face + vertex + edge
@@ -35,6 +43,7 @@ vec3_t camera_position = { .x = 0, .y = 0, .z = 0 };
 // Frame Rate Setup
 int prev_frame_time;
 int time_to_wait;
+
 
 // Merge sort algorithm for depth sorting
 
@@ -107,16 +116,13 @@ void setup() {
     double z_far = 100.0; // also random value
     proj_matrix = mat4_project(aspect, fov, z_near, z_far);
 
-    // Manually load hardcoded texture values
-    mesh_texture = (uint32_t*) RED_BRICK_TEXTURE;
-    tex_width = 64;
-    tex_height = 64;
-
     // Loads the cube values in the mesh data structure
-    load_cube_mesh_data();
+    // load_cube_mesh_data();
 
     // Load the obj mesh data
-    // load_obj_mesh_data("./models/sphere.obj");
+    // load_obj_mesh_data(mesh, "./models/sphere.obj");
+    wave = create_wave();
+    mesh = wave.mesh;
 }
 
 void process_input() {
@@ -191,7 +197,7 @@ void process_input() {
 vec2_t project_ortho(vec3_t point) {
     // Convert 3D point to 2D on x and y axis
     vec2_t projected_point = {
-        .x = (fov_factor * point.x),    // Multiply by field ov  factor to scale the point up
+        .x = (fov_factor * point.x),    // Multiply by field of factor to scale the point up
         .y = (fov_factor * point.y)
     };
 
@@ -229,10 +235,15 @@ void update() {
     // mesh.scale.x = 0.5;
     // mesh.scale.y = 0.5;
     // mesh.scale.z = 0.5;
-    // //
-    // anim_bounce(mesh, default_pos.x, 3, -14, default_pos.z, 30, 15, 30, ++current_frame);
+    //
+    // anim_bounce(mesh, default_pos.x, 1.5, -10, default_pos.z, 22, 5, 30, ++current_frame);
 
-    mesh.rot.x += 0.01;
+    simulate_waves(wave, 30, current_frame++);
+    mesh = wave.mesh;
+    // mesh.pos.z += 0.1;
+    // mesh.rot.x += 0.01;
+    // mesh.rot.y += 0.01;
+    // mesh.rot.z += 0.01;
 
     mat4_t scale_matrix = mat4_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
     mat4_t translate_matrix = mat4_translate(mesh.pos.x, mesh.pos.y, mesh.pos.z);
@@ -338,11 +349,6 @@ void update() {
                 { projected_points[1].x, projected_points[1].y },
                 { projected_points[2].x, projected_points[2].y }
             },
-            .tex_coords = {
-                { current_face.a_uv.u, current_face.a_uv.v },
-                { current_face.b_uv.u, current_face.b_uv.v },
-                { current_face.c_uv.u, current_face.c_uv.v }
-            },
             .color = face_color,
             .avg_depth = avg_depth
         };
@@ -380,26 +386,7 @@ void render() {
             );
         }
 
-        if(control == 0 || control == 8 || control == 9) {
-            // Draw textured triangle from vertices
-            draw_textured_triangle(
-                triangle.points[0].x,
-                triangle.points[0].y,
-                triangle.tex_coords[0].u,
-                triangle.tex_coords[0].v,
-                triangle.points[1].x,
-                triangle.points[1].y,
-                triangle.tex_coords[1].u,
-                triangle.tex_coords[1].v,
-                triangle.points[2].x,
-                triangle.points[2].y,
-                triangle.tex_coords[2].u,
-                triangle.tex_coords[2].v,
-                mesh_texture
-            );
-        }
-
-        if(control == 0 || control == 2 || control == 4 || control == 6 || control == 7 || control == 9) {
+        if(control == 0 || control == 2 || control == 4 || control == 6 || control == 7) {
             // Draw triangle edges from vertices
             uint32_t edge_color;
             if(control == 2 || control == 4 || control == 8) {
