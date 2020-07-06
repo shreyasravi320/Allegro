@@ -245,7 +245,7 @@ void update() {
     // mesh.scale.y = 2;
     // mesh.scale.z = 2;
     //
-    anim_bounce(mesh, default_pos.x, 1.5, -10, default_pos.z, 22, 5, 30, ++current_frame);
+    // anim_bounce(mesh, default_pos.x, 1.5, -10, default_pos.z, 22, 5, 30, ++current_frame);
     // base.self_theta += 0.001;
     // joint1.self_theta += 0.01;
     // joint2.self_theta += 0.1;
