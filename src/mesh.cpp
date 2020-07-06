@@ -2,14 +2,14 @@
 
 using namespace std;
 
-vec3_t default_pos = { .x = 0, .y = -3, .z = 40 };
+vec3_t default_pos = { .x = -15, .y = -1, .z = 30 };
 vec3_t default_scale = { .x = 1, .y = 1, .z = 1 };
 vec3_t default_rot = { .x = 0, .y = 0, .z = 0 };
 
 // mesh_t mesh = {
-//     .rot = default_rot,
-//     .scale = default_scale,
-//     .pos = default_pos
+    // .rot = default_rot,
+    // .scale = default_scale,
+    // .pos = default_pos
 // };
 
 vec3_t cube_vertices[N_CUBE_VERTICES] = {

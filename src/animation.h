@@ -6,6 +6,7 @@
 #include "vectors.h"
 #include "matrix.h"
 #include "mesh.h"
+#include "display.h"
 
 using namespace std;
 
@@ -19,8 +20,24 @@ void anim_parabola(mesh_t& mesh, double xs, double max_h, double xe, double zs, 
 
 void anim_bounce(mesh_t& mesh, double xs, double max_h, double xe, double zs, double ze, int bounces, double frames, double current_frame);
 
-void anim_sin(double& value, double frame, double speed);
 
+// Forward and Inverse Kinematics
 
+class joint_t {
+public:
+    vec3_t pos1;
+    double len;
+    double theta;
+    double self_theta;
+    vec3_t pos2;
+    joint_t* parent = nullptr;
+    joint_t* child;
+};
+
+joint_t create_joint(double x, double y, double len, double theta);
+
+joint_t create_joint(joint_t* parent, double len, double theta);
+
+void joint_render(joint_t& joint);
 
 #endif

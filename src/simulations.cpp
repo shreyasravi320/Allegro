@@ -29,3 +29,7 @@ void simulate_waves(wave_t& wave, double frames, double current_frame) {
         wave.mesh.vertices[i].y = amplitude * sin(theta);
     }
 }
+
+void splash(wave_t wave) {
+
+}

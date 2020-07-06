@@ -13,6 +13,10 @@ using namespace std;
 
 const double PI = 3.141592653589793238462;
 
+vector<joint_t> joints;
+joint_t base;
+joint_t joint1;
+joint_t joint2;
 wave_t wave;
 mesh_t mesh = {
     .rot = default_rot,
@@ -120,9 +124,14 @@ void setup() {
     // load_cube_mesh_data();
 
     // Load the obj mesh data
-    // load_obj_mesh_data(mesh, "./models/sphere.obj");
-    wave = create_wave();
-    mesh = wave.mesh;
+    mesh = load_obj_mesh_data(mesh, "./models/sphere.obj");
+    // wave = create_wave();
+    // mesh = wave.mesh;
+
+    // Create n number of joints for forward/inverse kinematics
+    // base = create_joint(win_width / 2, win_height / 2, 200, -PI / 2);
+    // joint1 = create_joint(&base, 100, -PI / 2);
+    // joint2 = create_joint(&joint1, 50, -PI / 2);
 }
 
 void process_input() {
@@ -232,16 +241,20 @@ void update() {
     triangles_to_render.clear();
 
     // Perform Animations
-    // mesh.scale.x = 0.5;
-    // mesh.scale.y = 0.5;
-    // mesh.scale.z = 0.5;
+    // mesh.scale.x = 2;
+    // mesh.scale.y = 2;
+    // mesh.scale.z = 2;
     //
-    // anim_bounce(mesh, default_pos.x, 1.5, -10, default_pos.z, 22, 5, 30, ++current_frame);
-
-    simulate_waves(wave, 30, current_frame++);
-    mesh = wave.mesh;
+    anim_bounce(mesh, default_pos.x, 1.5, -10, default_pos.z, 22, 5, 30, ++current_frame);
+    // base.self_theta += 0.001;
+    // joint1.self_theta += 0.01;
+    // joint2.self_theta += 0.1;
+    // joint_render(base);
+    // joint_render(joint1);
+    // joint_render(joint2);
+    // simulate_waves(wave, 30, current_frame++);
+    // mesh = wave.mesh;
     // mesh.pos.z += 0.1;
-    // mesh.rot.x += 0.01;
     // mesh.rot.y += 0.01;
     // mesh.rot.z += 0.01;
 

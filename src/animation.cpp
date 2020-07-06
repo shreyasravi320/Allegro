@@ -135,6 +135,32 @@ void anim_bounce(mesh_t& mesh, double xs, double max_h, double xe, double zs, do
     }
 }
 
-void anim_sin(double& value, double frame, double speed) {
-    value = sin(frame * speed);
+joint_t create_joint(double x, double y, double len, double theta) {
+    // joint_t joint = { .mesh = { .rot = default_rot, .scale = default_scale, .pos = default_pos },
+    //                   .pos1 = { .x = x, .y = y }, .len = len, .pos2 = { .x = x1, .y = y1 } };
+    // joint.mesh = load_obj_mesh_data(joint.mesh, "./models/bone.obj");
+    // joint.mesh.vertices[0].x = joint.pos2.x;    // Top vertex
+    // joint.mesh.vertices[2].x = joint.pos1.x;    // Bottom vertex
+    joint_t joint = { .pos1 = { .x = x, .y = y }, .len = len, .theta = theta, .self_theta = theta };
+    joint.pos2 = { .x = x + len * cos(theta), .y = y + len * sin(theta) };
+    joint.parent = nullptr;
+    return joint;
+}
+
+joint_t create_joint(joint_t* parent, double len, double theta) {
+    joint_t joint = { .pos1 = { .x = parent->pos2.x, .y = parent->pos2.y }, .len = len, .theta = theta, .self_theta = theta, .parent = parent };
+    joint.pos2 = { .x = parent->pos2.x + len * cos(theta), .y = parent->pos2.y + len * sin(theta) };
+    return joint;
+}
+
+// Draw joints as line segments
+void joint_render(joint_t& joint) {
+    joint.theta = joint.self_theta;
+    if(joint.parent != nullptr) {
+        joint.pos1.x = joint.parent->pos2.x;
+        joint.pos1.y = joint.parent->pos2.y;
+        joint.theta += joint.parent->theta;
+    }
+    joint.pos2 = { .x = joint.pos1.x + joint.len * cos(joint.theta), .y = joint.pos1.y + joint.len * sin(joint.theta) };
+    draw_line(joint.pos1.x, joint.pos1.y, joint.pos2.x, joint.pos2.y, yellow);
 }
