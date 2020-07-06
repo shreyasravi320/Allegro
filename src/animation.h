@@ -31,13 +31,22 @@ public:
     double self_theta;
     vec3_t pos2;
     joint_t* parent = nullptr;
-    joint_t* child;
 };
 
-joint_t create_joint(double x, double y, double len, double theta);
+joint_t fk_create_joint(double x, double y, double len, double theta);
 
-joint_t create_joint(joint_t* parent, double len, double theta);
+joint_t fk_create_joint(joint_t* parent, double len, double theta);
 
-void joint_render(joint_t& joint);
+void follow(joint_t& joint, double dx, double dy);
+
+void follow(joint_t& joint, joint_t parent);
+
+joint_t ik_create_joint(double x, double y, double len, double theta);
+
+joint_t ik_create_joint(joint_t* parent, double len, double theta);
+
+void ik_set_base(joint_t& joint, vec3_t pos);
+
+void joint_render(joint_t& joint, uint32_t color);
 
 #endif

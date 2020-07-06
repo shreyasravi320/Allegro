@@ -13,10 +13,11 @@ using namespace std;
 
 const double PI = 3.141592653589793238462;
 
-vector<joint_t> joints;
-joint_t base;
-joint_t joint1;
-joint_t joint2;
+const int joint_size = 50;
+joint_t joints[joint_size];
+vec3_t fixed_base = { (double) win_width / 4, (double) win_height / 2, 0 };
+int mouseX, mouseY;
+
 wave_t wave;
 mesh_t mesh = {
     .rot = default_rot,
@@ -124,14 +125,18 @@ void setup() {
     // load_cube_mesh_data();
 
     // Load the obj mesh data
-    mesh = load_obj_mesh_data(mesh, "./models/sphere.obj");
+    // mesh = load_obj_mesh_data(mesh, "./models/sphere.obj");
     // wave = create_wave();
     // mesh = wave.mesh;
 
     // Create n number of joints for forward/inverse kinematics
-    // base = create_joint(win_width / 2, win_height / 2, 200, -PI / 2);
-    // joint1 = create_joint(&base, 100, -PI / 2);
-    // joint2 = create_joint(&joint1, 50, -PI / 2);
+    joints[0] = ik_create_joint(win_width / 2, win_height / 2, 10, 0);
+
+    for(int i = 1; i < joint_size; i++) {
+        joints[i] = ik_create_joint(&joints[i - 1], 10, 0);
+    }
+    // joints[1] = ik_create_joint(&joints[0], 75, 0);
+    // joints[2] = ik_create_joint(&joints[1], 75, 0);
 }
 
 void process_input() {
@@ -230,6 +235,8 @@ vec2_t project(vec3_t point) {
 
 void update() {
 
+    SDL_GetMouseState(&mouseX, &mouseY);
+
     time_to_wait = FRAME_TARGET_LENGTH - (SDL_GetTicks() - prev_frame_time);
     if(time_to_wait > 0 && time_to_wait <= FRAME_TARGET_LENGTH) {    // Delay execution until the time passed is the Frame Target Length
         SDL_Delay(time_to_wait);
@@ -246,17 +253,32 @@ void update() {
     // mesh.scale.z = 2;
     //
     // anim_bounce(mesh, default_pos.x, 1.5, -10, default_pos.z, 22, 5, 30, ++current_frame);
-    // base.self_theta += 0.001;
-    // joint1.self_theta += 0.01;
+    // base.self_theta += 0.1 / 3600;
+    // joint1.self_theta += 0.1 / 60;
     // joint2.self_theta += 0.1;
-    // joint_render(base);
-    // joint_render(joint1);
-    // joint_render(joint2);
+    // joint_render(base, green);
+    // joint_render(joint1, yellow);
+    // joint_render(joint2, orange);
     // simulate_waves(wave, 30, current_frame++);
     // mesh = wave.mesh;
     // mesh.pos.z += 0.1;
     // mesh.rot.y += 0.01;
     // mesh.rot.z += 0.01;
+
+    follow(joints[joint_size - 1], mouseX, mouseY);
+    joint_render(joints[joint_size - 1], green);
+
+    for(int i = joint_size - 2; i >= 1; i--) {
+        follow(joints[i], joints[i + 1].pos1.x, joints[i + 1].pos1.y);
+        joint_render(joints[i], yellow);
+    }
+
+    follow(joints[0], joints[1].pos1.x, joints[1].pos1.y);
+    joint_render(joints[0], red);
+
+    for(int i = 1; i < joint_size; i++) {
+        ik_set_base(joints[i], joints[i - 1].pos2);
+    }
 
     mat4_t scale_matrix = mat4_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
     mat4_t translate_matrix = mat4_translate(mesh.pos.x, mesh.pos.y, mesh.pos.z);
@@ -270,7 +292,7 @@ void update() {
 
         face_t current_face = mesh.faces[i];
         vec3_t face_vertices[3];
-        face_vertices[0] = mesh.vertices[current_face.a - 1];   // our current face_t a index starts at 1, so we need to subtract 1 to compensate
+        face_vertices[0] = mesh.vertices[current_face.a - 1];   // our current face_t a index starts at 1, subtract 1 to compensate
         face_vertices[1] = mesh.vertices[current_face.b - 1];
         face_vertices[2] = mesh.vertices[current_face.c - 1];
 
@@ -377,7 +399,7 @@ void update() {
 
 void render() {
 
-    draw_grid(60, 0xFF444444);  // Draw a gray grid
+    // draw_grid(60, 0xFF444444);  // Draw a gray grid
 
     // Loop through array and render all projected triangles
     int size = triangles_to_render.size();

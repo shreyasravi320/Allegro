@@ -114,7 +114,6 @@ void draw_pixel(int x, int y, uint32_t color) {
 
 void draw_line(int x0, int y0, int x1, int y1, uint32_t color) {
 
-    // Implementation of DDA Line Drawing algorithm - replace with Bresenham's for speed
     int x = x1 - x0;
     int y = y1 - y0;
 
