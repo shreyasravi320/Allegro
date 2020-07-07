@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include "color.h"
-#include "swap.h"
+#include "helpers.h"
 #include "vectors.h"
 #include "simulations.h"
 

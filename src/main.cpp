@@ -8,15 +8,14 @@
 #include "light.h"
 #include "animation.h"
 #include "simulations.h"
+#include "helpers.h"
 
 using namespace std;
 
-const double PI = 3.141592653589793238462;
-
-const int joint_size = 50;
+const int joint_size = 60;
 joint_t joints[joint_size];
-vec3_t fixed_base = { (double) win_width / 4, (double) win_height / 2, 0 };
-int mouseX, mouseY;
+int followX, followY;
+vec3_t fixed_base;
 
 wave_t wave;
 mesh_t mesh = {
@@ -49,59 +48,7 @@ vec3_t camera_position = { .x = 0, .y = 0, .z = 0 };
 int prev_frame_time;
 int time_to_wait;
 
-
-// Merge sort algorithm for depth sorting
-
-void merge(vector<triangle_t>& parent, vector<triangle_t>& left, int left_size, vector<triangle_t>& right, int right_size) {
-    int parent_idx = 0, left_idx = 0, right_idx = 0;
-
-    while(left_idx < left_size && right_idx < right_size) {
-        if(left[left_idx].avg_depth <= right[right_idx].avg_depth) {
-            parent[parent_idx++] = left[left_idx++];
-        }
-        else {
-            parent[parent_idx++] = right[right_idx++];
-        }
-    }
-    while(left_idx < left_size) {
-        parent[parent_idx++] = left[left_idx++];
-    }
-    while(right_idx < right_size) {
-        parent[parent_idx++] = right[right_idx++];
-    }
-}
-
-void merge_sort(vector<triangle_t>& v, int size) {
-
-    if(size < 2) {
-        return;
-    }
-
-    int left_size = size / 2;
-    int right_size = size - left_size;
-
-    vector<triangle_t> left;
-    vector<triangle_t> right;
-    for(int i = 0; i < left_size; ++i) {
-        left.push_back(v[i]);
-    }
-    for(int i = 0; i < right_size; ++i) {
-        right.push_back(v[i + left_size]);
-    }
-
-    merge_sort(left, left_size);
-    merge_sort(right, right_size);
-
-    merge(v, left, left_size, right, right_size);
-
-    left.clear();
-    left.shrink_to_fit();
-    right.clear();
-    right.shrink_to_fit();
-}
-
 void setup() {
-
     // Allocate 32 bits of memory for color for each pixel on the screen
     color_buffer = (uint32_t*) malloc(sizeof(uint32_t) * win_width * win_height);
 
@@ -129,12 +76,17 @@ void setup() {
     // wave = create_wave();
     // mesh = wave.mesh;
 
-    // Create n number of joints for forward/inverse kinematics
-    joints[0] = ik_create_joint(win_width / 2, win_height / 2, 10, 0);
+    // Initialize fixed base for inverse/forward kinematics
+    fixed_base = { .x = (double) win_width / 2, .y = (double) win_height - 50, .z = 0 };
 
-    for(int i = 1; i < joint_size; i++) {
-        joints[i] = ik_create_joint(&joints[i - 1], 10, 0);
+    // Create n number of joints for forward/inverse kinematics
+    joints[0] = ik_create_joint(win_width / 2, win_height / 2, 10, PI / 2);
+
+    for(int i = 1; i < joint_size - 1; i++) {
+        joints[i] = ik_create_joint(&joints[i - 1], 10, PI / 2);
     }
+    joints[joint_size - 1] = ik_create_joint(&joints[joint_size - 2], 10, 0);
+
     // joints[1] = ik_create_joint(&joints[0], 75, 0);
     // joints[2] = ik_create_joint(&joints[1], 75, 0);
 }
@@ -235,7 +187,7 @@ vec2_t project(vec3_t point) {
 
 void update() {
 
-    SDL_GetMouseState(&mouseX, &mouseY);
+    SDL_GetMouseState(&followX, &followY);
 
     time_to_wait = FRAME_TARGET_LENGTH - (SDL_GetTicks() - prev_frame_time);
     if(time_to_wait > 0 && time_to_wait <= FRAME_TARGET_LENGTH) {    // Delay execution until the time passed is the Frame Target Length
@@ -265,20 +217,23 @@ void update() {
     // mesh.rot.y += 0.01;
     // mesh.rot.z += 0.01;
 
-    follow(joints[joint_size - 1], mouseX, mouseY);
-    joint_render(joints[joint_size - 1], green);
-
+    follow(joints[joint_size - 1], followX, followY);
     for(int i = joint_size - 2; i >= 1; i--) {
         follow(joints[i], joints[i + 1].pos1.x, joints[i + 1].pos1.y);
-        joint_render(joints[i], yellow);
     }
-
     follow(joints[0], joints[1].pos1.x, joints[1].pos1.y);
-    joint_render(joints[0], red);
 
-    for(int i = 1; i < joint_size; i++) {
+    for(int i = i; i < joint_size; i++) {
         ik_set_base(joints[i], joints[i - 1].pos2);
     }
+    ik_set_base(joints[0], fixed_base);
+
+    ik_joint_render(joints[0], red);
+    for(int i = 1; i < joint_size - 1; i++) {
+        ik_joint_render(joints[i], yellow);
+    }
+    ik_joint_render(joints[joint_size - 1], green);
+
 
     mat4_t scale_matrix = mat4_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
     mat4_t translate_matrix = mat4_translate(mesh.pos.x, mesh.pos.y, mesh.pos.z);

@@ -7,6 +7,7 @@
 #include "matrix.h"
 #include "mesh.h"
 #include "display.h"
+#include "helpers.h"
 
 using namespace std;
 
@@ -39,14 +40,14 @@ joint_t fk_create_joint(joint_t* parent, double len, double theta);
 
 void follow(joint_t& joint, double dx, double dy);
 
-void follow(joint_t& joint, joint_t parent);
-
 joint_t ik_create_joint(double x, double y, double len, double theta);
 
 joint_t ik_create_joint(joint_t* parent, double len, double theta);
 
 void ik_set_base(joint_t& joint, vec3_t pos);
 
-void joint_render(joint_t& joint, uint32_t color);
+void fk_joint_render(joint_t& joint, uint32_t color);
+
+void ik_joint_render(joint_t& joint, uint32_t color);
 
 #endif
