@@ -31,3 +31,38 @@ uint32_t white = 0xFFFFFFFF;
 
 // Gray
 uint32_t gray = 0xFF606060;
+
+uint32_t string_to_color(string color) {
+    transform(color.begin(), color.end(), color.begin(), ::tolower);
+    if(color == "red") {
+        return red;
+    }
+    if(color == "orange") {
+        return orange;
+    }
+    if(color == "yellow") {
+        return yellow;
+    }
+    if(color == "green") {
+        return green;
+    }
+    if(color == "blue") {
+        return blue;
+    }
+    if(color == "purple") {
+        return purple;
+    }
+    if(color == "pink") {
+        return pink;
+    }
+    if(color == "black") {
+        return black;
+    }
+    if(color == "white") {
+        return white;
+    }
+    if(color == "gray") {
+        return gray;
+    }
+    return white;
+}

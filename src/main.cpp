@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <vector>
 #include "vectors.h"
 #include "display.h"
@@ -9,13 +10,15 @@
 #include "animation.h"
 #include "simulations.h"
 #include "helpers.h"
+#include <unordered_map>
+// #include "scene.h"
 
 using namespace std;
 
-const int joint_size = 60;
-joint_t joints[joint_size];
-int followX, followY;
-vec3_t fixed_base;
+// const int joint_size = 60;
+// joint_t joints[joint_size];
+// int followX, followY;
+// vec3_t fixed_base;
 
 wave_t wave;
 mesh_t mesh = {
@@ -48,7 +51,7 @@ vec3_t camera_position = { .x = 0, .y = 0, .z = 0 };
 int prev_frame_time;
 int time_to_wait;
 
-void setup() {
+void setup(string model, string color, string size) {
     // Allocate 32 bits of memory for color for each pixel on the screen
     color_buffer = (uint32_t*) malloc(sizeof(uint32_t) * win_width * win_height);
 
@@ -72,20 +75,33 @@ void setup() {
     // load_cube_mesh_data();
 
     // Load the obj mesh data
-    // mesh = load_obj_mesh_data(mesh, "./models/sphere.obj");
+    uint32_t col = white;
+    if(color.size() != 0) {
+        col = string_to_color(color);
+    }
+
+    string mesh_name = "./models/" + model + ".obj";
+    mesh = load_obj_mesh_data(mesh, mesh_name, col);
+
+    double sc = 1;
+    if(size == "big") {
+        sc = 2;
+    }
+    mesh.scale = vec3_mul(default_scale, sc);
+
     // wave = create_wave();
     // mesh = wave.mesh;
 
     // Initialize fixed base for inverse/forward kinematics
-    fixed_base = { .x = (double) win_width / 2, .y = (double) win_height - 50, .z = 0 };
-
-    // Create n number of joints for forward/inverse kinematics
-    joints[0] = ik_create_joint(win_width / 2, win_height / 2, 10, PI / 2);
-
-    for(int i = 1; i < joint_size - 1; i++) {
-        joints[i] = ik_create_joint(&joints[i - 1], 10, PI / 2);
-    }
-    joints[joint_size - 1] = ik_create_joint(&joints[joint_size - 2], 10, 0);
+    // fixed_base = { .x = (double) win_width / 2, .y = (double) win_height - 50, .z = 0 };
+    //
+    // // Create n number of joints for forward/inverse kinematics
+    // joints[0] = ik_create_joint(win_width / 2, win_height / 2, 10, PI / 2);
+    //
+    // for(int i = 1; i < joint_size - 1; i++) {
+    //     joints[i] = ik_create_joint(&joints[i - 1], 10, PI / 2);
+    // }
+    // joints[joint_size - 1] = ik_create_joint(&joints[joint_size - 2], 10, 0);
 
     // joints[1] = ik_create_joint(&joints[0], 75, 0);
     // joints[2] = ik_create_joint(&joints[1], 75, 0);
@@ -187,7 +203,7 @@ vec2_t project(vec3_t point) {
 
 void update() {
 
-    SDL_GetMouseState(&followX, &followY);
+    // SDL_GetMouseState(&followX, &followY);
 
     time_to_wait = FRAME_TARGET_LENGTH - (SDL_GetTicks() - prev_frame_time);
     if(time_to_wait > 0 && time_to_wait <= FRAME_TARGET_LENGTH) {    // Delay execution until the time passed is the Frame Target Length
@@ -205,35 +221,29 @@ void update() {
     // mesh.scale.z = 2;
     //
     // anim_bounce(mesh, default_pos.x, 1.5, -10, default_pos.z, 22, 5, 30, ++current_frame);
-    // base.self_theta += 0.1 / 3600;
-    // joint1.self_theta += 0.1 / 60;
-    // joint2.self_theta += 0.1;
-    // joint_render(base, green);
-    // joint_render(joint1, yellow);
-    // joint_render(joint2, orange);
+
     // simulate_waves(wave, 30, current_frame++);
     // mesh = wave.mesh;
     // mesh.pos.z += 0.1;
-    // mesh.rot.y += 0.01;
+    mesh.rot.y += 0.01;
     // mesh.rot.z += 0.01;
 
-    follow(joints[joint_size - 1], followX, followY);
-    for(int i = joint_size - 2; i >= 1; i--) {
-        follow(joints[i], joints[i + 1].pos1.x, joints[i + 1].pos1.y);
-    }
-    follow(joints[0], joints[1].pos1.x, joints[1].pos1.y);
-
-    for(int i = i; i < joint_size; i++) {
-        ik_set_base(joints[i], joints[i - 1].pos2);
-    }
-    ik_set_base(joints[0], fixed_base);
-
-    ik_joint_render(joints[0], red);
-    for(int i = 1; i < joint_size - 1; i++) {
-        ik_joint_render(joints[i], yellow);
-    }
-    ik_joint_render(joints[joint_size - 1], green);
-
+    // follow(joints[joint_size - 1], followX, followY);
+    // for(int i = joint_size - 2; i >= 1; i--) {
+    //     follow(joints[i], joints[i + 1].pos1.x, joints[i + 1].pos1.y);
+    // }
+    // follow(joints[0], joints[1].pos1.x, joints[1].pos1.y);
+    //
+    // for(int i = i; i < joint_size; i++) {
+    //     ik_set_base(joints[i], joints[i - 1].pos2);
+    // }
+    // ik_set_base(joints[0], fixed_base);
+    //
+    // ik_joint_render(joints[0], red);
+    // for(int i = 1; i < joint_size - 1; i++) {
+    //     ik_joint_render(joints[i], yellow);
+    // }
+    // ik_joint_render(joints[joint_size - 1], green);
 
     mat4_t scale_matrix = mat4_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
     mat4_t translate_matrix = mat4_translate(mesh.pos.x, mesh.pos.y, mesh.pos.z);
@@ -429,7 +439,31 @@ int main() {
     // Create an SDL Window
     is_running = init_window();
 
-    setup();
+    string model;
+    string color;
+    string size;
+
+    unordered_map<string, string> params;
+    string key;
+    string value;
+    int len;
+    cin >> len;
+
+    for(int i = 0; i < len; i++) {
+        cin >> key;
+        cin >> value;
+        params[key] = value;
+    }
+
+    for (auto const& p : params) {
+        if(p.first == "Dimensions") size = p.second;
+        if(p.first == "Colors") color = p.second;
+        if(p.first == "Objects") model = p.second;
+    }
+
+    cout.flush();
+
+    setup(model, color, size);
     // double sum;
     // double sub;
     // int i = 0;

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-vec3_t default_pos = { .x = -15, .y = -1, .z = 30 };
+vec3_t default_pos = { .x = 0, .y = 0, .z = 10 };
 vec3_t default_scale = { .x = 1, .y = 1, .z = 1 };
 vec3_t default_rot = { .x = 0, .y = 0, .z = 0 };
 
@@ -66,7 +66,7 @@ void load_cube_mesh_data() {
     }
 }
 
-mesh_t load_obj_mesh_data(mesh_t mesh, string file) {
+mesh_t load_obj_mesh_data(mesh_t mesh, string file, uint32_t color) {
 
     // Read contents of obj file
     ifstream in_file1(file);
@@ -133,7 +133,7 @@ mesh_t load_obj_mesh_data(mesh_t mesh, string file) {
                 .a = vertex_indices[0],
                 .b = vertex_indices[1],
                 .c = vertex_indices[2],
-                .color = white
+                .color = color
             };
 
             mesh.faces.push_back(face);

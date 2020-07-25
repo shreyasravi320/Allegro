@@ -14,7 +14,7 @@ double gravity = 3;
 double fix_y = default_pos.y;
 
 wave_t create_wave() {
-    wave_t wave = { .mesh = load_obj_mesh_data(wave_mesh, "./models/plane.obj") };
+    wave_t wave = { .mesh = load_obj_mesh_data(wave_mesh, "./models/plane.obj", blue) };
     return wave;
 }
 

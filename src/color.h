@@ -2,6 +2,7 @@
 #define COLOR_H
 
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -34,5 +35,7 @@ extern uint32_t white;
 
 // Gray
 extern uint32_t gray;
+
+uint32_t string_to_color(string color);
 
 #endif
