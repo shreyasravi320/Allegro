@@ -100,19 +100,19 @@ void setup(string model, string color) {
     // wave = create_wave();
     // mesh = wave.mesh;
 
-    // Initialize fixed base for inverse/forward kinematics
-    // fixed_base = { .x = (double) win_width / 2, .y = (double) win_height - 50, .z = 0 };
-    //
-    // // Create n number of joints for forward/inverse kinematics
-    // joints[0] = ik_create_joint(win_width / 2, win_height / 2, 10, PI / 2);
-    //
-    // for(int i = 1; i < joint_size - 1; i++) {
-    //     joints[i] = ik_create_joint(&joints[i - 1], 10, PI / 2);
-    // }
-    // joints[joint_size - 1] = ik_create_joint(&joints[joint_size - 2], 10, 0);
+    Initialize fixed base for inverse/forward kinematics
+    fixed_base = { .x = (double) win_width / 2, .y = (double) win_height - 50, .z = 0 };
 
-    // joints[1] = ik_create_joint(&joints[0], 75, 0);
-    // joints[2] = ik_create_joint(&joints[1], 75, 0);
+    // Create n number of joints for forward/inverse kinematics
+    joints[0] = ik_create_joint(win_width / 2, win_height / 2, 10, PI / 2);
+
+    for(int i = 1; i < joint_size - 1; i++) {
+        joints[i] = ik_create_joint(&joints[i - 1], 10, PI / 2);
+    }
+    joints[joint_size - 1] = ik_create_joint(&joints[joint_size - 2], 10, 0);
+
+    joints[1] = ik_create_joint(&joints[0], 75, 0);
+    joints[2] = ik_create_joint(&joints[1], 75, 0);
 }
 
 void process_input() {
@@ -238,26 +238,26 @@ void update(mesh_t& mesh, bool is_wave) {
     if(!is_wave) {
         // mesh.rot.y += 0.01;
         // mesh.pos.x += 0.1;
-        anim_bounce(mesh, -5, 3, -3, default_pos.z, default_pos.z, 10, 30, ++current_frame);
+        // anim_bounce(mesh, -5, 3, -3, default_pos.z, default_pos.z, 10, 30, ++current_frame);
     }
     // mesh.rot.z += 0.01;
 
-    // follow(joints[joint_size - 1], followX, followY);
-    // for(int i = joint_size - 2; i >= 1; i--) {
-    //     follow(joints[i], joints[i + 1].pos1.x, joints[i + 1].pos1.y);
-    // }
-    // follow(joints[0], joints[1].pos1.x, joints[1].pos1.y);
-    //
-    // for(int i = i; i < joint_size; i++) {
-    //     ik_set_base(joints[i], joints[i - 1].pos2);
-    // }
-    // ik_set_base(joints[0], fixed_base);
-    //
-    // ik_joint_render(joints[0], red);
-    // for(int i = 1; i < joint_size - 1; i++) {
-    //     ik_joint_render(joints[i], yellow);
-    // }
-    // ik_joint_render(joints[joint_size - 1], green);
+    follow(joints[joint_size - 1], followX, followY);
+    for(int i = joint_size - 2; i >= 1; i--) {
+        follow(joints[i], joints[i + 1].pos1.x, joints[i + 1].pos1.y);
+    }
+    follow(joints[0], joints[1].pos1.x, joints[1].pos1.y);
+
+    for(int i = i; i < joint_size; i++) {
+        ik_set_base(joints[i], joints[i - 1].pos2);
+    }
+    ik_set_base(joints[0], fixed_base);
+
+    ik_joint_render(joints[0], red);
+    for(int i = 1; i < joint_size - 1; i++) {
+        ik_joint_render(joints[i], yellow);
+    }
+    ik_joint_render(joints[joint_size - 1], green);
 
     mat4_t scale_matrix = mat4_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
     mat4_t translate_matrix = mat4_translate(mesh.pos.x, mesh.pos.y, mesh.pos.z);
@@ -457,78 +457,45 @@ int main() {
     // Create an SDL Window
     is_running = init_window();
 
-    // string model;
-    // string color;
-    // string size;
-    // string animation;
-    //
-    // unordered_map<string, unordered_map<string, string>> params;
-    // string key;
-    // unordered_map<string, string> values;
-    //
-    // int len_k;
-    // cin >> len_k;
-    //
-    // int len_v;
-    // cin >> len_v;
-    //
-    // cin >> key;
-    // for(int i = 0; i < len_v; i++) {
-    //     string value;
-    //     string desc;
-    //     cin >> value;
-    //     cin >> desc;
-    //     values.insert({value, desc});
-    // }
-    //
-    // params[key] = values;
-    //
-    // for(auto const& p : params) {
-    //     model = p.first;
-    //
-    //     for(auto const& p1 : p.second) {
-    //         if(p1.second == "Dimensions") size = p1.first;
-    //         if(p1.second == "Colors") color = p1.first;
-    //         if(p1.second == "Properties") animation = p1.first;
-    //     }
-    // }
-    default_pos.y = -3;
-    default_pos.x = 0;
-    default_pos.z = 40;
-    setup("plane", "green");
-    default_pos.z = 30;
-    default_pos.x = -5;
-    default_pos.y = -2;
-    // default_pos.y = -2.8;
-    // default_pos.x = -25;
-    setup("ball", "pink");
-    // default_pos.x = 0;
-    // default_pos.y = -3;
-    // default_pos.z = 40;
-    // default_pos.x = 0;
-    // wave_t wave = create_wave();
-    // mesh_t mesh3 = wave.mesh;
-    // meshes.push_back(mesh3);
+    string model;
+    string color;
+    string size;
+    string animation;
 
-    // for (auto const& p : params) {
-    //     // if(p.first == "Positions") position = p.second;
-    //     if(p.first == "Dimensions") size = p.second;
-    //     if(p.first == "Colors") color = p.second;
-    //     if(p.first == "Model") model = p.second;
-    // }
+    unordered_map<string, unordered_map<string, string>> params;
+    string key;
+    unordered_map<string, string> values;
 
+    int len_k;
+    cin >> len_k;
 
-    // for(auto const& p : params) {
-    //     cout << p.first << " ";
-    //     for(int i = 0; i < p.second.size(); i++) {
-    //         cout << p.second[i] << " ";
-    //     }
-    //     cout << endl;
-    // }
+    int len_v;
+    cin >> len_v;
+
+    cin >> key;
+    for(int i = 0; i < len_v; i++) {
+        string value;
+        string desc;
+        cin >> value;
+        cin >> desc;
+        values.insert({value, desc});
+    }
+
+    params[key] = values;
+
+    for(auto const& p : params) {
+        model = p.first;
+
+        for(auto const& p1 : p.second) {
+            if(p1.second == "Dimensions") size = p1.first;
+            if(p1.second == "Colors") color = p1.first;
+            if(p1.second == "Properties") animation = p1.first;
+        }
+    }
 
     cout.flush();
 
-    // setup(model, color, size);
+    setup(model, color, size);
     // double sum;
     // double sub;
     // int i = 0;
@@ -537,8 +504,9 @@ int main() {
         // auto start = chrono::high_resolution_clock::now();
 
         process_input();
-        update(meshes[0], true);
-        update(meshes[1], false);
+        for(mesh_t mesh : meshes) {
+            update(mesh, false);
+        }
         render();
 
         // auto stop = chrono::high_resolution_clock::now();
