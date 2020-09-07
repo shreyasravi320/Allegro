@@ -8,4 +8,4 @@ An animation engine focused on simplicity and ease of access. You can either tal
 # Demos
 Using the built in wave simulation, a scene with a boat floating across an ocean can be made
 
-[![Watch the video]](https://drive.google.com/file/d/1zQG5Ogxj2YxKaoU_Hfceagx8kkBzR2vF/view?usp=sharing)
+(https://drive.google.com/file/d/1zQG5Ogxj2YxKaoU_Hfceagx8kkBzR2vF/view?usp=sharing)
