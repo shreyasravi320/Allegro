@@ -22,3 +22,9 @@ A standard animation of a ball bouncing is shown here. Mode switching is enabled
 7. Vertices, Wireframe, and Faces
 
 ![](https://github.com/Wh1t3Sail0r/Allegro/blob/feature/demos/Allegro%20Demo%202.gif)
+
+---
+
+2D Forward and Inverse Kinematics algorithms have been implemented
+
+![](https://github.com/Wh1t3Sail0r/Allegro/blob/feature/demos/Allegro%20Demo%203.gif)
