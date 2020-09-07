@@ -11,6 +11,7 @@
 #include "simulations.h"
 #include "helpers.h"
 #include <unordered_map>
+#include <set>
 // #include "scene.h"
 
 using namespace std;
@@ -20,12 +21,13 @@ using namespace std;
 // int followX, followY;
 // vec3_t fixed_base;
 
-wave_t wave;
-mesh_t mesh = {
-    .rot = default_rot,
-    .scale = default_scale,
-    .pos = default_pos
-};
+vector<mesh_t> meshes;
+// wave_t wave;
+// mesh_t mesh = {
+//     .rot = default_rot,
+//     .scale = default_scale,
+//     .pos = default_pos
+// };
 
 mat4_t proj_matrix;
 // Mode control
@@ -51,7 +53,7 @@ vec3_t camera_position = { .x = 0, .y = 0, .z = 0 };
 int prev_frame_time;
 int time_to_wait;
 
-void setup(string model, string color, string size) {
+void setup(string model, string color) {
     // Allocate 32 bits of memory for color for each pixel on the screen
     color_buffer = (uint32_t*) malloc(sizeof(uint32_t) * win_width * win_height);
 
@@ -75,19 +77,25 @@ void setup(string model, string color, string size) {
     // load_cube_mesh_data();
 
     // Load the obj mesh data
+    triangles_to_render.clear();
+
     uint32_t col = white;
     if(color.size() != 0) {
         col = string_to_color(color);
     }
 
     string mesh_name = "./models/" + model + ".obj";
-    mesh = load_obj_mesh_data(mesh, mesh_name, col);
+    mesh_t mesh = { .pos = default_pos, .rot = default_rot, .scale = default_scale };
+    meshes.push_back(load_obj_mesh_data(mesh, mesh_name, col));
 
-    double sc = 1;
-    if(size == "big") {
-        sc = 2;
-    }
-    mesh.scale = vec3_mul(default_scale, sc);
+    // double sc = 1;
+    // if(dimensions == "big") {
+    //     sc = 2;
+    // }
+    // else if(dimensions == "small") {
+    //     sc = 0.25;
+    // }
+    // mesh.scale = vec3_mul(mesh.scale, sc);
 
     // wave = create_wave();
     // mesh = wave.mesh;
@@ -201,7 +209,7 @@ vec2_t project(vec3_t point) {
     return project_persp(point);
 }
 
-void update() {
+void update(mesh_t& mesh, bool is_wave) {
 
     // SDL_GetMouseState(&followX, &followY);
 
@@ -213,19 +221,25 @@ void update() {
     prev_frame_time = SDL_GetTicks();
 
     // Initialize triangle array
-    triangles_to_render.clear();
+    // triangles_to_render.clear();
 
     // Perform Animations
     // mesh.scale.x = 2;
     // mesh.scale.y = 2;
     // mesh.scale.z = 2;
     //
-    // anim_bounce(mesh, default_pos.x, 1.5, -10, default_pos.z, 22, 5, 30, ++current_frame);
 
-    // simulate_waves(wave, 30, current_frame++);
+
+    if(is_wave) {
+        // simulate_waves(mesh, 30, current_frame++);
+    }
     // mesh = wave.mesh;
     // mesh.pos.z += 0.1;
-    mesh.rot.y += 0.01;
+    if(!is_wave) {
+        // mesh.rot.y += 0.01;
+        // mesh.pos.x += 0.1;
+        anim_bounce(mesh, -5, 3, -3, default_pos.z, default_pos.z, 10, 30, ++current_frame);
+    }
     // mesh.rot.z += 0.01;
 
     // follow(joints[joint_size - 1], followX, followY);
@@ -427,10 +441,14 @@ void render() {
 void free_resources() {
 
     // Free dynamically allocated memory after program quits
-    mesh.vertices.clear();
-    mesh.vertices.shrink_to_fit();
-    mesh.faces.clear();
-    mesh.faces.shrink_to_fit();
+    for(mesh_t mesh : meshes) {
+        mesh.vertices.clear();
+        mesh.vertices.shrink_to_fit();
+        mesh.faces.clear();
+        mesh.faces.shrink_to_fit();
+    }
+    meshes.clear();
+    meshes.shrink_to_fit();
     free(color_buffer);
 }
 
@@ -439,40 +457,88 @@ int main() {
     // Create an SDL Window
     is_running = init_window();
 
-    string model;
-    string color;
-    string size;
+    // string model;
+    // string color;
+    // string size;
+    // string animation;
+    //
+    // unordered_map<string, unordered_map<string, string>> params;
+    // string key;
+    // unordered_map<string, string> values;
+    //
+    // int len_k;
+    // cin >> len_k;
+    //
+    // int len_v;
+    // cin >> len_v;
+    //
+    // cin >> key;
+    // for(int i = 0; i < len_v; i++) {
+    //     string value;
+    //     string desc;
+    //     cin >> value;
+    //     cin >> desc;
+    //     values.insert({value, desc});
+    // }
+    //
+    // params[key] = values;
+    //
+    // for(auto const& p : params) {
+    //     model = p.first;
+    //
+    //     for(auto const& p1 : p.second) {
+    //         if(p1.second == "Dimensions") size = p1.first;
+    //         if(p1.second == "Colors") color = p1.first;
+    //         if(p1.second == "Properties") animation = p1.first;
+    //     }
+    // }
+    default_pos.y = -3;
+    default_pos.x = 0;
+    default_pos.z = 40;
+    setup("plane", "green");
+    default_pos.z = 30;
+    default_pos.x = -5;
+    default_pos.y = -2;
+    // default_pos.y = -2.8;
+    // default_pos.x = -25;
+    setup("ball", "pink");
+    // default_pos.x = 0;
+    // default_pos.y = -3;
+    // default_pos.z = 40;
+    // default_pos.x = 0;
+    // wave_t wave = create_wave();
+    // mesh_t mesh3 = wave.mesh;
+    // meshes.push_back(mesh3);
 
-    unordered_map<string, string> params;
-    string key;
-    string value;
-    int len;
-    cin >> len;
+    // for (auto const& p : params) {
+    //     // if(p.first == "Positions") position = p.second;
+    //     if(p.first == "Dimensions") size = p.second;
+    //     if(p.first == "Colors") color = p.second;
+    //     if(p.first == "Model") model = p.second;
+    // }
 
-    for(int i = 0; i < len; i++) {
-        cin >> key;
-        cin >> value;
-        params[key] = value;
-    }
 
-    for (auto const& p : params) {
-        if(p.first == "Dimensions") size = p.second;
-        if(p.first == "Colors") color = p.second;
-        if(p.first == "Objects") model = p.second;
-    }
+    // for(auto const& p : params) {
+    //     cout << p.first << " ";
+    //     for(int i = 0; i < p.second.size(); i++) {
+    //         cout << p.second[i] << " ";
+    //     }
+    //     cout << endl;
+    // }
 
     cout.flush();
 
-    setup(model, color, size);
+    // setup(model, color, size);
     // double sum;
     // double sub;
     // int i = 0;
-
+    control = 6;
     while(is_running) {
         // auto start = chrono::high_resolution_clock::now();
 
         process_input();
-        update();
+        update(meshes[0], true);
+        update(meshes[1], false);
         render();
 
         // auto stop = chrono::high_resolution_clock::now();

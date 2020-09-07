@@ -12,59 +12,59 @@ vec3_t default_rot = { .x = 0, .y = 0, .z = 0 };
     // .pos = default_pos
 // };
 
-vec3_t cube_vertices[N_CUBE_VERTICES] = {
-    // { .x = -1, .y = -1, .z = -1 }, // 1
-    // { .x = -1, .y =  1, .z = -1 }, // 2
-    // { .x =  1, .y =  1, .z = -1 }, // 3
-    // { .x =  1, .y = -1, .z = -1 }, // 4
-    // { .x =  1, .y =  1, .z =  1 }, // 5
-    // { .x =  1, .y = -1, .z =  1 }, // 6
-    // { .x = -1, .y =  1, .z =  1 }, // 7
-    // { .x = -1, .y = -1, .z =  1 }  // 8
-
-    { .x =  1, .y = -1, .z =  1 }, // 6 -> 1
-    { .x =  1, .y =  1, .z =  1 }, // 5 -> 2
-    { .x = -1, .y =  1, .z =  1 }, // 7 -> 3
-    { .x = -1, .y = -1, .z =  1 }, // 8 -> 4
-    { .x = -1, .y =  1, .z = -1 }, // 2 -> 5
-    { .x = -1, .y = -1, .z = -1 }, // 1 -> 6
-    { .x =  1, .y =  1, .z = -1 }, // 3 -> 7
-    { .x =  1, .y = -1, .z = -1 }  // 4 -> 8
-};
-
-face_t cube_faces[N_CUBE_FACES] = {
-    // front
-    { .a = 1, .b = 2, .c = 3, .color = white },
-    { .a = 1, .b = 3, .c = 4, .color = white },
-    // right
-    { .a = 4, .b = 3, .c = 5, .color = white },
-    { .a = 4, .b = 5, .c = 6, .color = white },
-    // back
-    { .a = 6, .b = 5, .c = 7, .color = white },
-    { .a = 6, .b = 7, .c = 8, .color = white },
-    // left
-    { .a = 8, .b = 7, .c = 2, .color = white },
-    { .a = 8, .b = 2, .c = 1, .color = white },
-    // top
-    { .a = 2, .b = 7, .c = 5, .color = white },
-    { .a = 2, .b = 5, .c = 3, .color = white },
-    // bottom
-    { .a = 6, .b = 8, .c = 1, .color = white },
-    { .a = 6, .b = 1, .c = 4, .color = white }
-};
-
-void load_cube_mesh_data() {
-
-    // Loop through all cube vertices and push
-    for(int i = 0; i < N_CUBE_VERTICES; i++) {
-        mesh.vertices.push_back(cube_vertices[i]);
-    }
-
-    // Loop through all cube faces and push
-    for(int i = 0; i < N_CUBE_FACES; i++) {
-        mesh.faces.push_back(cube_faces[i]);
-    }
-}
+// vec3_t cube_vertices[N_CUBE_VERTICES] = {
+//     // { .x = -1, .y = -1, .z = -1 }, // 1
+//     // { .x = -1, .y =  1, .z = -1 }, // 2
+//     // { .x =  1, .y =  1, .z = -1 }, // 3
+//     // { .x =  1, .y = -1, .z = -1 }, // 4
+//     // { .x =  1, .y =  1, .z =  1 }, // 5
+//     // { .x =  1, .y = -1, .z =  1 }, // 6
+//     // { .x = -1, .y =  1, .z =  1 }, // 7
+//     // { .x = -1, .y = -1, .z =  1 }  // 8
+//
+//     { .x =  1, .y = -1, .z =  1 }, // 6 -> 1
+//     { .x =  1, .y =  1, .z =  1 }, // 5 -> 2
+//     { .x = -1, .y =  1, .z =  1 }, // 7 -> 3
+//     { .x = -1, .y = -1, .z =  1 }, // 8 -> 4
+//     { .x = -1, .y =  1, .z = -1 }, // 2 -> 5
+//     { .x = -1, .y = -1, .z = -1 }, // 1 -> 6
+//     { .x =  1, .y =  1, .z = -1 }, // 3 -> 7
+//     { .x =  1, .y = -1, .z = -1 }  // 4 -> 8
+// };
+//
+// face_t cube_faces[N_CUBE_FACES] = {
+//     // front
+//     { .a = 1, .b = 2, .c = 3, .color = white },
+//     { .a = 1, .b = 3, .c = 4, .color = white },
+//     // right
+//     { .a = 4, .b = 3, .c = 5, .color = white },
+//     { .a = 4, .b = 5, .c = 6, .color = white },
+//     // back
+//     { .a = 6, .b = 5, .c = 7, .color = white },
+//     { .a = 6, .b = 7, .c = 8, .color = white },
+//     // left
+//     { .a = 8, .b = 7, .c = 2, .color = white },
+//     { .a = 8, .b = 2, .c = 1, .color = white },
+//     // top
+//     { .a = 2, .b = 7, .c = 5, .color = white },
+//     { .a = 2, .b = 5, .c = 3, .color = white },
+//     // bottom
+//     { .a = 6, .b = 8, .c = 1, .color = white },
+//     { .a = 6, .b = 1, .c = 4, .color = white }
+// };
+//
+// void load_cube_mesh_data() {
+//
+//     // Loop through all cube vertices and push
+//     for(int i = 0; i < N_CUBE_VERTICES; i++) {
+//         mesh.vertices.push_back(cube_vertices[i]);
+//     }
+//
+//     // Loop through all cube faces and push
+//     for(int i = 0; i < N_CUBE_FACES; i++) {
+//         mesh.faces.push_back(cube_faces[i]);
+//     }
+// }
 
 mesh_t load_obj_mesh_data(mesh_t mesh, string file, uint32_t color) {
 

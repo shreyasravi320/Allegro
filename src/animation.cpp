@@ -67,6 +67,9 @@ void anim_parabola(mesh_t& mesh, double xs, double max_h, double xe, double zs, 
 
     dx = (xe - xs) / frames;
     dy = dx * slope;
+    if(xe == xs) {
+        dy = (max_h - mesh.pos.y) * (max_h - mesh.pos.y);
+    }
     dz = (ze - zs) / frames;
 
     if(xe != mesh.pos.x) {

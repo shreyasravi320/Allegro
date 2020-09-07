@@ -15,8 +15,8 @@ using namespace std;
 // Vertices for a cube
 #define N_CUBE_VERTICES (8)
 extern vec3_t cube_vertices[N_CUBE_VERTICES];
-
-// 6 cube faces, 2 triangles per face
+//
+// // 6 cube faces, 2 triangles per face
 #define N_CUBE_FACES (12)
 extern face_t cube_faces[N_CUBE_FACES];
 
@@ -36,7 +36,7 @@ extern vec3_t default_pos;
 extern vec3_t default_scale;
 extern vec3_t default_rot;
 
-void load_cube_mesh_data();
+// void load_cube_mesh_data();
 
 mesh_t load_obj_mesh_data(mesh_t mesh, string file, uint32_t color);
 

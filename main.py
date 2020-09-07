@@ -94,12 +94,11 @@ import numpy as np
 print('Processing data...')
 
 # Category -> words
-cat = {
-    'Models': ['Objects', 'Animals', 'Vehicles', 'Environments'],
-    'Materials': ['Colors', 'Textures'],
-}
+models = ['Objects', 'Animals', 'Vehicles', 'Environments']
+materials = ['Colors', 'Textures', 'Properties']
+
 data = {
-    'Objects': ['sphere', 'cube', 'football', 'table', 'bench', 'lamp', 'phone', 'trophy', 'tree', 'house', 'plant', 'stick', 'door', 'vase', 'paper', 'headphones', 'piano', 'chair', 'pencil',
+    'Objects': ['ball', 'sphere', 'cube', 'pyramid', 'cone', 'football', 'table', 'bench', 'lamp', 'phone', 'trophy', 'tree', 'house', 'plant', 'stick', 'door', 'vase', 'paper', 'headphones', 'piano', 'chair', 'pencil',
                 'eraser', 'backpack', 'bed', 'computer', 'rock', 'flag'],
     'Dimensions': ['big', 'small', 'tiny', 'large'],
     'Positions': ['foreground', 'front', 'middle', 'back', 'background', 'left', 'right', 'top', 'bottom', 'above', 'below', 'inside'],
@@ -107,32 +106,33 @@ data = {
     'Vehicles': ['car', 'truck','ship', 'plane'],
     'Environments': ['ocean', 'desert', 'arctic', 'swamp', 'road', 'terrain', 'ground', 'sky'],
     'Colors': ['blue', 'brown', 'white', 'green'],
-    'Textures': ['smooth', 'sandy', 'rough', 'muddy', 'wooden']
+    'Textures': ['smooth', 'sandy', 'rough', 'muddy', 'wooden'],
+    'Properties': ['running', 'jumping', 'bouncing', 'swimming', 'rolling', 'flying', 'flies', 'breathes', 'swims']
 }
 
 # Words -> category
 categories = {word: key for key, words in data.items() for word in words}
 
 # Load the whole embedding matrix
-embeddings_index = {}
-with open('glove.6B.300d.txt') as f:
-  for line in f:
-    values = line.split()
-    word = values[0]
-    embed = np.array(values[1:], dtype=np.float32)
-    embeddings_index[word] = embed
-# print('Loaded %s word vectors.' % len(embeddings_index))
-# Embeddings for available words
-data_embeddings = {key: value for key, value in embeddings_index.items() if key in categories.keys()}
-print('Finished processing data')
+# embeddings_index = {}
+# with open('glove.6B.300d.txt') as f:
+#   for line in f:
+#     values = line.split()
+#     word = values[0]
+#     embed = np.array(values[1:], dtype=np.float32)
+#     embeddings_index[word] = embed
+# # print('Loaded %s word vectors.' % len(embeddings_index))
+# # Embeddings for available words
+# data_embeddings = {key: value for key, value in embeddings_index.items() if key in categories.keys()}
+# print('Finished processing data')
 
 import pickle
 
-with open('embeddings_index.pickle', 'wb') as f:
-    pickle.dump(embeddings_index, f, protocol=pickle.HIGHEST_PROTOCOL)
-
-with open('data_embeddings.pickle', 'wb') as f:
-    pickle.dump(data_embeddings, f, protocol=pickle.HIGHEST_PROTOCOL)
+# with open('embeddings_index.pickle', 'wb') as f:
+#     pickle.dump(embeddings_index, f, protocol=pickle.HIGHEST_PROTOCOL)
+#
+# with open('data_embeddings.pickle', 'wb') as f:
+#     pickle.dump(data_embeddings, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 with open('embeddings_index.pickle', 'rb') as f:
     embeddings_index = pickle.load(f)
@@ -147,6 +147,9 @@ import operator
 
 # Processing the query
 def categorize(query):
+    if query in categories:
+        return categories[query]
+
     query_embed = embeddings_index[query]
     scores = {}
     for word, embed in data_embeddings.items():
@@ -223,59 +226,118 @@ def get_animation_params(map):
 
 import subprocess
 from subprocess import Popen, PIPE
+from nltk.stem import PorterStemmer
+
+ps = PorterStemmer()
 
 subprocess.call(['make'])
 
 scene = str(input('Type: '))
+objs = []
 
 while scene:
+    obj_cat = {}
+
     p = Popen(['./Allegro'], shell=True, stdout=PIPE, stdin=PIPE)
 
     tokenized = preprocess(scene)
     tokens = process_content(tokenized)
 
     map = get_dict(tokens)
-    obj_cat = {}
-
-    print(map)
 
     for key, value in map.items():
         c_key = categorize(key)
+        if c_key == 'Colors':
+            map[key] = 'JJ'
         if c_key == 'Positions':
-            value = 'JJ'
-        if value == 'NN' or value == 'NNS' or value == 'NNP' or value == 'NNPS':
-            if c_key == 'Colors':
-                c_key = 'Objects'
-            obj_cat[c_key] = key
-        if value == 'JJ' or value == 'JJR' or value == 'JJS':
-            obj_cat[c_key] = key
+            map[key] = 'JJ'
+        if c_key == 'Textures':
+            map[key] = 'JJ'
+        if c_key == 'Properties':
+            map[key] = 'VBZ'
+    #     if value == 'NN' or value == 'NNS' or value == 'NNP' or value == 'NNPS':
+    #         if c_key == 'Colors':
+    #             c_key = 'Positions'
+    #         obj_cat[key] = c_key
+    #     else:
+    #         obj_cat[key] = c_key
+
+    map_copy = map.copy()
+    for key, value in map_copy.items():
+        map_copy[key] = categorize(key)
 
     keywrds = get_animation_params(map)
-    print(obj_cat)
-    print(keywrds)
+    # print(obj_cat)
+    print('Map: ', map_copy)
+    print('Keywords: ', keywrds)
 
-    length = len(obj_cat)
-    length = str(length) + '\n'
-    length = bytes(length, 'UTF-8')
-    p.stdin.write(length)
+    # for kk, vv in keywrds.items():
+    #     for word in vv:
+    #         print(ps.stem(word))
 
-    for key, val in obj_cat.items():
-        param1 = str(key) + '\n'
-        param1 = bytes(param1, 'UTF-8')  # Needed in Python 3.
-        p.stdin.write(param1)
+    # objs.append(obj_cat)
 
-        param2 = str(val) + '\n'
-        param2 = bytes(param2, 'UTF-8')  # Needed in Python 3.
-        p.stdin.write(param2)
+    size_k = 0
+    size_v = 0
+
+    for kk, vv in keywrds.items():
+        if kk:
+            size_k = 1
+            size_v = len(vv)
+
+    # Pass information from python to c++
+    length_k = str(size_k) + '\n'
+    length_k = bytes(length_k, 'UTF-8')
+    p.stdin.write(length_k)
+
+    length_v = str(size_v) + '\n'
+    length_v = bytes(length_v, 'UTF-8')
+    p.stdin.write(length_v)
+
+    for kk, vv in keywrds.items():
+        key_to_send = str(kk) + '\n'
+        key_to_send = bytes(key_to_send, 'UTF-8')
+        p.stdin.write(key_to_send)
+
+        for vvv in vv:
+            val_to_send = str(vvv) + '\n'
+            val_to_send = bytes(val_to_send, 'UTF-8')
+            p.stdin.write(val_to_send)
+
+            desc_to_send = str(map_copy[vvv]) + '\n'
+            desc_to_send = bytes(desc_to_send, 'UTF-8')
+            p.stdin.write(desc_to_send)
 
     p.stdin.flush()
-
     line = p.stdout.readline()
-
     while line:
         result = line.strip().decode()
         print(result)
         line = p.stdout.readline()
+
+    # for obj in objs:
+    #     for key, val in obj.items():
+    #         cat_key = val
+    #
+    #         if val in models:
+    #             cat_key = 'Model'
+    #
+    #         param1 = str(cat_key) + '\n'
+    #         param1 = bytes(param1, 'UTF-8')  # Needed in Python 3.
+    #         p.stdin.write(param1)
+    #
+    #         param2 = str(key) + '\n'
+    #         param2 = bytes(param2, 'UTF-8')  # Needed in Python 3.
+    #         p.stdin.write(param2)
+    #
+    # p.stdin.flush()
+    #
+    # line = p.stdout.readline()
+    #
+    # while line:
+    #     result = line.strip().decode()
+    #     print(result)
+    #     line = p.stdout.readline()
 
     scene = str(input('Type: '))
 
